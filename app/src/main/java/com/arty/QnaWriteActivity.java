@@ -23,12 +23,12 @@ import java.io.File;
 
 public class QnaWriteActivity extends AppCompatActivity {
     private static final String TAG = "QnaWriteActivity";
-    private final int GET_GALLERY_IMAGE = 200;
 
+    private final int GET_GALLERY_IMAGE = 200;
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private File file;
-    ImageView imgView;
+    private ImageView imgView1, imgView2, imgView3;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,26 +39,24 @@ public class QnaWriteActivity extends AppCompatActivity {
         File sdcard = Environment.getExternalStorageDirectory();
         String imageFileName = "capture.jpg";
         file = new File(sdcard, imageFileName);
-        imgView = findViewById(R.id.imageView1);
+
+        imgView1 = findViewById(R.id.imageView1);
+        imgView2 = findViewById(R.id.imageView2);
+        imgView3 = findViewById(R.id.imageView3);
     }
 
     public void btnTakePhoto(View v) {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        //Uri uri = FileProvider.getUriForFile(getBaseContext(), "com.arty.captureintent.fileprovider", file);
-        //intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-
-        // resolveActivity 메서드를 이용해 카메라 앱이 있는지 확인 가능 (하지만 이 메서드는 없었다고 한다)
-        if(intent.resolveActivity(getPackageManager()) != null)
+        Log.d(TAG, "[METHOD] btnTakePhoto 실행 여부 --> " + intent.resolveActivity(getPackageManager()));
+        if(intent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(intent, 101);
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult --> requestCode : " + requestCode + " , resultCode : " + resultCode);
-
-        // 인텐트에 정보가 포함되어 넘어오게 됨.
 
         if(requestCode == 101 && resultCode == Activity.RESULT_OK){
             /* 이미지 파일의 용량이 너무 커서 그대로 앱에 띄울 경우
@@ -73,7 +71,9 @@ public class QnaWriteActivity extends AppCompatActivity {
 
             Bundle extras = data.getExtras();
             Bitmap bitmap = (Bitmap) extras.get("data");
-            imgView.setImageBitmap(bitmap);
+
+            //Log.d(TAG, "onActivityResult --> 이미지 여부" + imgView1.getDrawableState());
+            imgView1.setImageBitmap(bitmap);
 
             Log.d(TAG, "onActivityResult --> 이미지 등록");
         }
