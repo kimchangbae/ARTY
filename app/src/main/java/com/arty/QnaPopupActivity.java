@@ -12,13 +12,15 @@ import android.widget.Toast;
 
 public class QnaPopupActivity extends Activity {
 
+    Intent intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_qna_popup);
 
-        Toast.makeText(getApplicationContext(), "QnaPopupActivity Call", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), "QnaPopupActivity Call", Toast.LENGTH_SHORT).show();
 
         // 팝업이 올라오면 배경 블러처리
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
@@ -28,27 +30,18 @@ public class QnaPopupActivity extends Activity {
 
         // 액티비티 바깥화면이 클릭되어도 종료되지 않게 설정하기
         this.setFinishOnTouchOutside(false);
+    }
 
-        Button btn_popup_1 = findViewById(R.id.btn_popup_1);
-        btn_popup_1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), QnaWriteActivity.class);
-                intent.putExtra("type", "1");
-                startActivityForResult(intent,1);
+    public void btnSickClick(View v) {
+        intent = new Intent(getApplicationContext(), QnaWriteActivity.class);
+        intent.putExtra("type", "1");
+        startActivityForResult(intent,1);
+    }
 
-            }
-        });
-
-        Button btn_popup_2 = findViewById(R.id.btn_popup_2);
-        btn_popup_2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), QnaWriteActivity.class);
-                intent.putExtra("type", "2");
-                startActivityForResult(intent,1);
-            }
-        });
+    public void btnCuriousClick(View v) {
+        intent = new Intent(getApplicationContext(), QnaWriteActivity.class);
+        intent.putExtra("type", "2");
+        startActivityForResult(intent,1);
     }
 
     @Override
@@ -58,11 +51,5 @@ public class QnaPopupActivity extends Activity {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        //안드로이드 백버튼 막기
-        //return;
     }
 }

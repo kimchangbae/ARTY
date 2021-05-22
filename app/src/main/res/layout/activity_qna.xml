@@ -45,13 +45,14 @@
             app:backgroundTint="#7D8284" />
 
         <Button
-            android:id="@+id/button_write"
+            android:id="@+id/btn_qna_write"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
             android:layout_weight="1"
+            android:onClick="qnaWrite"
             android:text="글쓰기"
             android:textSize="10sp"
             android:textStyle="bold"
@@ -65,7 +66,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
             android:layout_weight="1"
-            android:text="도감"
+            android:text="식물도감"
             android:textSize="10sp"
             android:textStyle="bold"
             app:backgroundTint="#7D8284" />
