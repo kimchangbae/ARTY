@@ -29,6 +29,6 @@
         android:layout_weight="1"
         android:onClick="btnCuriousClick"
         android:text="식물이 궁금해요"
-        android:textSize="21sp"
+        android:textSize="20sp"
         android:textStyle="bold" />
 </LinearLayout>
