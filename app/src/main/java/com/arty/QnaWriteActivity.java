@@ -20,15 +20,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.InputStream;
 
 public class QnaWriteActivity extends AppCompatActivity {
-    private static final String TAG = "QnaWriteActivity";
-
-    private final int GET_GALLERY_IMAGE = 200;
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-
-    private File file;
+    final String TAG = "QnaWriteActivity";
     private ImageView imgView1, imgView2, imgView3;
+    Bitmap bitmap;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,50 +33,75 @@ public class QnaWriteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_qna_write);
         inputType();
 
-        File sdcard = Environment.getExternalStorageDirectory();
-        String imageFileName = "capture.jpg";
-        file = new File(sdcard, imageFileName);
-
         imgView1 = findViewById(R.id.imageView1);
         imgView2 = findViewById(R.id.imageView2);
         imgView3 = findViewById(R.id.imageView3);
     }
 
+    public boolean isImgEmpty() {
+        boolean result = true;
+
+        // Not Null 은 섬네일 존재함을 의미.
+        if(imgView1.getDrawable() != null && imgView2.getDrawable() != null
+                && imgView3.getDrawable() != null)
+            result = false;
+
+        return result;
+    }
+
+    // 사진 촬영 버튼 클릭 이벤트
     public void btnTakePhoto(View v) {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Log.d(TAG, "[METHOD] btnTakePhoto 실행 여부 --> " + intent.resolveActivity(getPackageManager()));
-        if(intent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(intent, 101);
+        if(isImgEmpty()) {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+            if(intent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(intent, 101);
+            }
+        } else {
+            Toast.makeText(this,"사진은 3개까지만 등록 가능합니다.",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // 사진 가져오기 버튼 클릭 이벤트
+    public void btnCallPhoto(View v) {
+        // 한정된 이미지가 모두 등록 되었는지 체크
+        if(isImgEmpty()) {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(intent,201);
+        } else {
+            Toast.makeText(this,"사진은 3개까지만 등록 가능합니다.",Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult --> requestCode : " + requestCode + " , resultCode : " + resultCode);
 
-        if(requestCode == 101 && resultCode == Activity.RESULT_OK){
-            /* 이미지 파일의 용량이 너무 커서 그대로 앱에 띄울 경우
-             * 메모리 부족으로 비정상 종료될 수 있으므로 크기를 줄여 비트맵으로 로딩한 후 설정 */
-
-            /*
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 8; // 1/8 로 크기를 줄임
-            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-            imgView.setImageBitmap(bitmap);
-            */
-
-            Bundle extras = data.getExtras();
-            Bitmap bitmap = (Bitmap) extras.get("data");
-
-            //Log.d(TAG, "onActivityResult --> 이미지 여부" + imgView1.getDrawableState());
-            imgView1.setImageBitmap(bitmap);
-
-            Log.d(TAG, "onActivityResult --> 이미지 등록");
+        if(resultCode == Activity.RESULT_OK){
+            if(requestCode == 101) {
+                Bundle extras = data.getExtras();
+                bitmap = (Bitmap) extras.get("data");
+                inputImg(bitmap);
+            } else if(requestCode == 201) {
+                try {
+                    InputStream in = getContentResolver().openInputStream(data.getData());
+                    bitmap = BitmapFactory.decodeStream(in);
+                    in.close();
+                    inputImg(bitmap);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
-
+    public void inputImg(Bitmap bitmap) {
+        if(imgView1.getDrawable() == null) imgView1.setImageBitmap(bitmap);
+        else if(imgView2.getDrawable() == null) imgView2.setImageBitmap(bitmap);
+        else if(imgView3.getDrawable() == null) imgView3.setImageBitmap(bitmap);
+    }
 
     public void btnQnaInsert(View v) {
         Intent intent = new Intent(getApplicationContext(), QnaActivity.class);
@@ -91,12 +113,25 @@ public class QnaWriteActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String data = intent.getStringExtra("type");
 
-        Log.i(TAG, "큐앤에이 타입 : " + data);
-
         if(data.equals("1")) {
             txt_qna_type.setText("식물이 아파요");
         } else {
             txt_qna_type.setText("식물이 궁금해요");
         }
+    }
+
+    public void deleteImg_1 (View view) {
+        imgView1.setImageResource(0);
+        Toast.makeText(this,"사진1 삭제",Toast.LENGTH_SHORT).show();
+    }
+
+    public void deleteImg_2 (View view) {
+        imgView2.setImageResource(0);
+        Toast.makeText(this,"사진2 삭제",Toast.LENGTH_SHORT).show();
+    }
+
+    public void deleteImg_3 (View view) {
+        imgView3.setImageResource(0);
+        Toast.makeText(this,"사진3 삭제",Toast.LENGTH_SHORT).show();
     }
 }

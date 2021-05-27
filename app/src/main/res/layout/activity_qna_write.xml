@@ -24,8 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:text="TextView" />
+            android:layout_marginLeft="10dp" />
 
     </LinearLayout>
 
@@ -57,8 +56,8 @@
             android:id="@+id/qna_content_txt"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="@drawable/content_box"
             android:ems="10"
+            android:gravity="start"
             android:hint="내용을 작성하세요"
             android:inputType="textPersonName"
             android:selectAllOnFocus="true"
@@ -90,6 +89,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="btnCallPhoto"
             android:text="사진 불러오기" />
     </LinearLayout>
 
@@ -101,23 +101,26 @@
 
         <ImageView
             android:id="@+id/imageView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_weight="1"
+            android:onClick="deleteImg_1"
             tools:srcCompat="@tools:sample/avatars" />
 
         <ImageView
             android:id="@+id/imageView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_weight="1"
+            android:onClick="deleteImg_2"
             tools:srcCompat="@tools:sample/avatars" />
 
         <ImageView
             android:id="@+id/imageView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_weight="1"
+            android:onClick="deleteImg_3"
             tools:srcCompat="@tools:sample/avatars" />
     </LinearLayout>
 
