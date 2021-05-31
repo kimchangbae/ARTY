@@ -8,7 +8,7 @@ import java.util.Date;
 public class QnaList {
     String title;
     String qnaType;
-    //String context;
+    String context;
     String userName;
     //Date timeStamp;
     //Image img;
@@ -43,4 +43,11 @@ public class QnaList {
         this.userName = userName;
     }
 
+    public String getContext() {
+        return context;
+    }
+
+    public void setContext(String context) {
+        this.context = context;
+    }
 }

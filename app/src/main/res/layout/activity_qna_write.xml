@@ -134,7 +134,7 @@
         android:id="@+id/btn_qna_insert"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="btnQnaInsert"
+        android:onClick="bntQnaInsert"
         android:text="등록하기" />
 
 </LinearLayout>

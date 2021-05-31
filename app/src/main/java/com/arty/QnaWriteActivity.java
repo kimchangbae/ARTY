@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,13 +20,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+
 import java.io.File;
 import java.io.InputStream;
 
 public class QnaWriteActivity extends AppCompatActivity {
+    QnaList qnaList;
     final String TAG = "QnaWriteActivity";
     private ImageView imgView1, imgView2, imgView3;
     Bitmap bitmap;
+
+    private DatabaseReference dbRef;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +42,18 @@ public class QnaWriteActivity extends AppCompatActivity {
         imgView1 = findViewById(R.id.imageView1);
         imgView2 = findViewById(R.id.imageView2);
         imgView3 = findViewById(R.id.imageView3);
+    }
+
+    public void bntQnaInsert(View v) {
+        //String title    = v.findViewById(R.id.textView3).toString();
+        //String type     = v.findViewById(R.id.textView2).toString();
+        //String content  = v.findViewById(R.id.textView4).toString();
+        try {
+            Intent intent = new Intent(this, QnaActivity.class);
+            startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isImgEmpty() {
@@ -101,11 +119,6 @@ public class QnaWriteActivity extends AppCompatActivity {
         if(imgView1.getDrawable() == null) imgView1.setImageBitmap(bitmap);
         else if(imgView2.getDrawable() == null) imgView2.setImageBitmap(bitmap);
         else if(imgView3.getDrawable() == null) imgView3.setImageBitmap(bitmap);
-    }
-
-    public void btnQnaInsert(View v) {
-        Intent intent = new Intent(getApplicationContext(), QnaActivity.class);
-        startActivityForResult(intent, 1);
     }
 
     public void inputType() {
