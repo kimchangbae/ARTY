@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "122537817712",
+    "project_id": "arty-plantplaner",
+    "storage_bucket": "arty-plantplaner.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122537817712:android:07bacf8e7f67ede29fa6b5",
+        "android_client_info": {
+          "package_name": "com.arty"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "122537817712-ck2fdu6np54k0j1kt00unf816nto9nd8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvzrDKIdbP5usAsaobbA_Y9zC3DTIPtSY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "122537817712-ck2fdu6np54k0j1kt00unf816nto9nd8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
