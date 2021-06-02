@@ -7,7 +7,7 @@
     android:layout_gravity="center"
     android:background="#6C6969"
     android:orientation="horizontal"
-    tools:context=".QnaPopupActivity">
+    tools:context=".Qna.QnaPopup">
 
 
     <Button

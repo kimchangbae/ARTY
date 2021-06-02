@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF"
     android:orientation="vertical"
-    tools:context=".QnaActivity">
+    tools:context=".Qna.QnaMainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/qnaRecyclerView"
@@ -28,6 +28,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
             android:layout_weight="1"
+            android:onClick="goToHome"
             android:text="홈"
             android:textSize="10sp"
             android:textStyle="bold"
@@ -47,14 +48,14 @@
             app:backgroundTint="#7D8284" />
 
         <Button
-            android:id="@+id/btn_qna_write"
+            android:id="@+id/btn_write_qna"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
             android:layout_weight="1"
-            android:onClick="qnaWrite"
+            android:onClick="writeQna"
             android:text="글쓰기"
             android:textSize="10sp"
             android:textStyle="bold"

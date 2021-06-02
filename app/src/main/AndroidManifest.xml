@@ -5,9 +5,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-
-    <uses-feature android:name="android.hardware.camera"
-                    android:required="true"/>
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -16,8 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ARTY">
-
-        <activity android:name=".QnaActivity">
+        <activity android:name=".Qna.QnaDetailActivity"></activity>
+        <activity android:name=".Qna.QnaMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,21 +25,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".QnaPopupActivity"
+            android:name=".Qna.QnaPopup"
             android:theme="@android:style/Theme.Dialog" />
-        <activity android:name=".QnaWriteActivity" />
-        <activity android:name=".MainActivity" />
-
-        <provider
-            android:authorities="com.arty.captureintent.fileprovider"
-            android:name="androidx.core.content.FileProvider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/external"/>
-        </provider>
+        <activity android:name=".Qna.QnaWriteActivity" />
+        <activity android:name=".Main.MainActivity" />
+        <activity android:name=".user.LoginActivity" />
     </application>
-
 
 </manifest>

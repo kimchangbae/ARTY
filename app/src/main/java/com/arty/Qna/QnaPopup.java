@@ -1,4 +1,4 @@
-package com.arty;
+package com.arty.Qna;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,10 +7,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.Toast;
 
-public class QnaPopupActivity extends Activity {
+import com.arty.R;
+
+public class QnaPopup extends Activity {
 
     Intent intent;
 
@@ -18,9 +18,9 @@ public class QnaPopupActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_qna_popup);
+        setContentView(R.layout.qna_popup);
 
-        //Toast.makeText(getApplicationContext(), "QnaPopupActivity Call", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), "QnaPopup Call", Toast.LENGTH_SHORT).show();
 
         // 팝업이 올라오면 배경 블러처리
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
