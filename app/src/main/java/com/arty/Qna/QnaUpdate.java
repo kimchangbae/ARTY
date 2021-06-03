@@ -121,6 +121,7 @@ public class QnaUpdate extends AppCompatActivity {
                     @Override
                     public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                         if(!task.isSuccessful()) {
+                            Toast.makeText(getApplicationContext(),"미안...고칠게",Toast.LENGTH_SHORT).show();
                             throw task.getException();
                         }
                         return childRef.getDownloadUrl();
@@ -139,6 +140,7 @@ public class QnaUpdate extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull  Exception e) {
+                Toast.makeText(getApplicationContext(),"미안...고칠게",Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         });
@@ -249,6 +251,7 @@ public class QnaUpdate extends AppCompatActivity {
                     Bitmap bitmap = BitmapFactory.decodeStream(in);
                     inputImg(bitmap);
                 } catch (FileNotFoundException fileNotFoundException) {
+                    Toast.makeText(getApplicationContext(),"미안...고칠게",Toast.LENGTH_SHORT).show();
                     fileNotFoundException.printStackTrace();
                 }
 

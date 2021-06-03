@@ -47,4 +47,10 @@ public class QnaDetailActivity extends AppCompatActivity {
         intent.putExtra("qna",qna);
         startActivity(intent);
     }
+
+    public void deleteQna(View view) {
+        Intent intent = new Intent(this,QnaDelete.class);
+        intent.putExtra("qna",qna);
+        startActivity(intent);
+    }
 }

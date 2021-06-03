@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -76,11 +77,21 @@ public class QnaWriteActivity extends AppCompatActivity {
                 if(image1.getDrawable() == null) {
                     Toast.makeText(QnaWriteActivity.this,"사진은 반드시 등록해야 합니다.",Toast.LENGTH_SHORT).show();
                 } else {
+                    // 원인은 모르지만 uploadImage() 메서드와 writeQna() 메서드를 각각 실행하면
+                    // 이미지만 업로드 되고 문서는 업로드가 안되는 현상이 있다.
+                    // 그래서 uploadImage()의 onComplete 내부에서 실행되도록 했다.
                     uploadImage();
-                    writeQna();
                 }
             }
         });
+    }
+
+    public boolean onTouchEvent(MotionEvent event) {
+        //바깥레이어 클릭시 안닫히게
+        if(event.getAction()==MotionEvent.ACTION_OUTSIDE){
+            return false;
+        }
+        return true;
     }
 
     public void uploadImage() {
@@ -188,7 +199,7 @@ public class QnaWriteActivity extends AppCompatActivity {
 
             }
         } else {
-            Toast.makeText(this,"사진은 3개까지만 등록 가능합니다.",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"등록불가",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -211,7 +222,7 @@ public class QnaWriteActivity extends AppCompatActivity {
             intent.setAction(Intent.ACTION_GET_CONTENT);
             startActivityForResult(intent, 201);
         } else {
-            Toast.makeText(this, "사진은 3개까지만 등록 가능합니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "등록불가", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -228,6 +239,7 @@ public class QnaWriteActivity extends AppCompatActivity {
                     Bitmap bitmap = BitmapFactory.decodeStream(in);
                     inputImg(bitmap);
                 } catch (FileNotFoundException fileNotFoundException) {
+                    Toast.makeText(getApplicationContext(),"미안...고칠게",Toast.LENGTH_SHORT).show();
                     fileNotFoundException.printStackTrace();
                 }
 

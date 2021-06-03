@@ -7,8 +7,9 @@
         android:required="true" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />/>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
 
     <application
         android:allowBackup="true"
@@ -17,11 +18,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ARTY">
+        <activity android:name=".Qna.QnaDelete"></activity>
         <activity android:name=".Main.MainActivity" />
         <activity android:name=".user.LoginActivity" />
         <activity android:name=".Qna.QnaWriteActivity" />
-        <activity android:name=".Qna.QnaDetailActivity"/>
-        <activity android:name=".Qna.QnaUpdate"/>
+        <activity android:name=".Qna.QnaDetailActivity" />
+        <activity android:name=".Qna.QnaUpdate" />
         <activity android:name=".Qna.QnaMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,16 +34,16 @@
         <activity
             android:name=".Qna.QnaPopup"
             android:theme="@android:style/Theme.Dialog" />
+
         <provider
-            android:authorities="com.arty.Qna.fileprovider"
             android:name="androidx.core.content.FileProvider"
+            android:authorities="com.arty.Qna.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
-
     </application>
 
 </manifest>
