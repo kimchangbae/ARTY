@@ -1,51 +1,51 @@
 package com.arty.Qna;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arty.R;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
-import org.w3c.dom.Text;
-
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 
 public class QnaWriteActivity extends AppCompatActivity {
     static final String TODAY = new SimpleDateFormat("yyMMdd").format(new Date(System.currentTimeMillis()));
-
-    private TextView title, qnaType, content;
-    private ImageView imgView1;
-    Bitmap bitmap;
     private static String userId = "admin";
+    static final String COLLECTION_NAME = "QNA_BOARD";
 
-    private DatabaseReference databaseReference;
-    private FirebaseFirestore db;
+    private TextView    title, contentType, content;
+    private ImageView   image1;
+    public  Uri         imgUri, downloadUri;
+    Bitmap              bitmap;
+
+    private FirebaseFirestore   db;
+    private FirebaseStorage     storage;
+    private StorageReference    storageReference;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,77 +53,95 @@ public class QnaWriteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_qna_write);
         inputType(); // QnaPopup 액티비티에서 식물이아파요 or 식물이 궁금해요 선택한 정보를 화면에 뿌려준다.
 
-        title       = findViewById(R.id.insertTitle);
-        qnaType     = findViewById(R.id.insertQnaType);
-        content     = findViewById(R.id.insertContent);
-        imgView1    = findViewById(R.id.imageView1);
+        title           = findViewById(R.id.in_title);
+        contentType     = findViewById(R.id.in_contentType);
+        content         = findViewById(R.id.in_content);
+        image1          = findViewById(R.id.imageView1);
 
-        Button btn_new_qna = findViewById(R.id.btn_new_qna);
-        btn_new_qna.setOnClickListener(new View.OnClickListener() {
+        image1.setDrawingCacheEnabled(true);
+        image1.buildDrawingCache();
+
+        findViewById(R.id.btn_new_qna).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // 제목 정보를 가져와 입력이 없으면 리턴.
-                String str_title = title.getText().toString();
-                if(TextUtils.isEmpty(str_title)) {
-                    Toast.makeText(QnaWriteActivity.this,"제목을 입력하세요.",Toast.LENGTH_SHORT).show();
+                if(image1.getDrawable() == null) {
+                    Toast.makeText(QnaWriteActivity.this,"사진은 반드시 등록해야 합니다.",Toast.LENGTH_SHORT).show();
                 } else {
-                    newWriteQna(view);
-                    // writeNewQna(view);
+                    uploadImage();
                 }
             }
         });
     }
 
-    public void newWriteQna(View view) {
-        try {
-            db = FirebaseFirestore.getInstance();
-            //db.collection("QNA").document("admin").collection(getDate);
+    public void uploadImage() {
+        UploadTask uploadTask;
+        final String randomKey = UUID.randomUUID().toString();
 
-            Qna qna = new Qna();
+        storage = FirebaseStorage.getInstance();
+        storageReference =storage.getReference();
 
-            String str_title = title.getText().toString();
-            String str_qnaType = qnaType.getText().toString();
-            String str_content = content.getText().toString();
+        StorageReference childRef = storageReference.child(COLLECTION_NAME +"/"+randomKey);
+        uploadTask = childRef.putFile(imgUri);
 
-            qna.setTitle(str_title);
-            qna.setQnaType(str_qnaType);
-            qna.setContent(str_content);
-
-            db.collection("QNA")
-                    .document("admin")
-                    .collection(TODAY)
-                    .add(qna)
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                @Override
-                public void onSuccess(DocumentReference documentReference) {
-                    toast("글ID : [" +documentReference.getId()+ "]");
-
-                    goToQnaMainActivity();
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot snapshot) {
+                double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+                Log.d("QnaWriteActivity", "Upload is " + progress + "% done");
+                Toast.makeText(getApplicationContext(),"사진을"+progress+"%업로드 중입니다.",Toast.LENGTH_SHORT).show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                    @Override
+                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if(!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+                        return childRef.getDownloadUrl();
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if(task.isSuccessful()) {
+                            downloadUri = task.getResult();
+                            writeQna(downloadUri);
+                        }
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull  Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    public void writeNewQna(View view) {
-        databaseReference = FirebaseDatabase.getInstance().getReference("QNA");
+    public void writeQna(Uri downloadUri) {
+        db = FirebaseFirestore.getInstance();
         Qna qna = new Qna();
 
         try {
-            String str_title    = title.getText().toString();
-            String str_qnaType = qnaType.getText().toString();
-            String str_content  = content.getText().toString();
+            String str_title        = title.getText().toString();
+            String str_contentType  = contentType.getText().toString();
+            String str_content      = content.getText().toString();
 
             qna.setTitle(str_title);
-            qna.setQnaType(str_qnaType);
+            qna.setContentType(str_contentType);
             qna.setContent(str_content);
+            qna.setImage1(downloadUri.toString());
+            qna.setUserId(userId);
 
-            Log.d("writeNewQna", "writeNewQna ---> qna.toString" + qna.toString());
-
-            databaseReference.child(userId).setValue(qna);
-
-            goToQnaMainActivity();
+            db.collection(COLLECTION_NAME)
+                    .add(qna)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            goToQnaMainActivity();
+                        }
+                    });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,16 +150,6 @@ public class QnaWriteActivity extends AppCompatActivity {
     public void goToQnaMainActivity() {
         Intent intent = new Intent(this, QnaMainActivity.class);
         startActivity(intent);
-    }
-
-    public boolean isImgEmpty() {
-        boolean result = true;
-
-        // Not Null 은 섬네일 존재함을 의미.
-        if(imgView1.getDrawable() != null)
-            result = false;
-
-        return result;
     }
 
     // 사진 촬영 버튼 클릭 이벤트
@@ -158,7 +166,7 @@ public class QnaWriteActivity extends AppCompatActivity {
     }
 
     // 사진 가져오기 버튼 클릭 이벤트
-    public void bringAPicture(View v) {
+    public void choosePicture(View v) {
         // 한정된 이미지가 모두 등록 되었는지 체크
         if(isImgEmpty()) {
             Intent intent = new Intent();
@@ -170,50 +178,57 @@ public class QnaWriteActivity extends AppCompatActivity {
         }
     }
 
+    // 사진 촬영 완료 or 사진 가져오기 완료 후 이벤트
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(resultCode == Activity.RESULT_OK){
             if(requestCode == 101) {
+                // 사진 촬영
                 Bundle extras = data.getExtras();
                 bitmap = (Bitmap) extras.get("data");
                 inputImg(bitmap);
             } else if(requestCode == 201) {
-                try {
-                    InputStream in = getContentResolver().openInputStream(data.getData());
-                    bitmap = BitmapFactory.decodeStream(in);
-                    in.close();
-                    inputImg(bitmap);
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
+                // 사진 불러오기
+                imgUri = data.getData();
+                image1.setImageURI(imgUri);
             }
         }
     }
 
+    // 이미지뷰에 가져온 이미지 파일 넣기
+    public void inputImg(Bitmap bitmap) {
+        if(image1.getDrawable() == null) image1.setImageBitmap(bitmap);
+    }
+
     public void inputType() {
-        qnaType = findViewById(R.id.insertQnaType);
+        contentType = findViewById(R.id.in_contentType);
         Intent intent = getIntent();
         String data = intent.getStringExtra("type");
 
         if(data.equals("1")) {
-            qnaType.setText("식물이 아파요");
+            contentType.setText("식물이 아파요");
         } else {
-            qnaType.setText("식물이 궁금해요");
+            contentType.setText("식물이 궁금해요");
         }
     }
 
-    public void inputImg(Bitmap bitmap) {
-        if(imgView1.getDrawable() == null) imgView1.setImageBitmap(bitmap);
-    }
-
-    public void deleteImg_1 (View view) {
-        imgView1.setImageResource(0);
-        Toast.makeText(this,"사진1 삭제",Toast.LENGTH_SHORT).show();
+    public void deleteImage1 (View view) {
+        image1.setImageResource(0);
     }
 
     public void toast(String str) {
         Toast.makeText(this,str,Toast.LENGTH_SHORT).show();
+    }
+
+    public boolean isImgEmpty() {
+        boolean result = true;
+
+        // Not Null 은 섬네일 존재함을 의미.
+        if(image1.getDrawable() != null)
+            result = false;
+
+        return result;
     }
 }

@@ -20,7 +20,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/insertQnaType"
+            android:id="@+id/in_contentType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -40,7 +40,7 @@
             android:text="제목" />
 
         <EditText
-            android:id="@+id/insertTitle"
+            android:id="@+id/in_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -53,7 +53,7 @@
             android:text="내용" />
 
         <EditText
-            android:id="@+id/insertContent"
+            android:id="@+id/in_content"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:ems="10"
@@ -89,7 +89,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="bringAPicture"
+            android:onClick="choosePicture"
             android:text="사진 불러오기" />
     </LinearLayout>
 

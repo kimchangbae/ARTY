@@ -37,7 +37,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="#8BC34A"
-                    android:text="title"
+                    android:text="제목"
                     android:textSize="20sp" />
 
                 <LinearLayout
@@ -47,7 +47,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/tv_qnaType"
+                        android:id="@+id/tv_contentType"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
@@ -56,7 +56,7 @@
                         android:layout_marginRight="10dp"
                         android:layout_weight="1"
                         android:background="#E91E63"
-                        android:text="qnaType" />
+                        android:text="질문 속성" />
 
                     <TextView
                         android:id="@+id/tv_userId"
@@ -68,7 +68,14 @@
                         android:layout_marginRight="10dp"
                         android:layout_weight="1"
                         android:background="#2196F3"
-                        android:text="userName" />
+                        android:text="작성자" />
+
+                    <TextView
+                        android:id="@+id/tv_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="작성시간" />
 
                 </LinearLayout>
             </LinearLayout>

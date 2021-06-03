@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.arty.R;
@@ -20,8 +19,6 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
     private Context context;
 
     QnaClickListener listener;
-
-    public QnaAdapter() {}
 
     public QnaAdapter(ArrayList<Qna> qnaLists, Context context) {
         this.qnaList = qnaLists;
@@ -49,7 +46,7 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
     }
 
     @Override
-    public QnaAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public QnaAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View itemView = layoutInflater.inflate(R.layout.qnalist_item, parent, false);
 
@@ -57,15 +54,15 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull QnaAdapter.ViewHolder holder, int position) {
-        // 추후 이미지 불러오기 위해 glide 기술을 사용할 예정
+    public void onBindViewHolder(QnaAdapter.ViewHolder holder, int position) {
         holder.tv_title.setText(qnaList.get(position).getTitle());
-        holder.tv_qnaType.setText(qnaList.get(position).getQnaType());
+        holder.tv_contentType.setText(qnaList.get(position).getContentType());
         holder.tv_userId.setText(qnaList.get(position).getUserId());
-        Glide.with(holder.itemView).load(qnaList.get(position).getImg()).into(holder.imageView);
 
-        // Qna item = qnaLists.get(position);
-        // holder.setItem(item);
+        Glide.with(holder.itemView).load(qnaList.get(position).getImage1()).into(holder.imageView);
+
+        //Qna item = qnaLists.get(position);
+        //holder.setItem(item);
     }
 
     @Override
@@ -74,18 +71,20 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder{
-        TextView    tv_title;      // 제목
-        TextView    tv_qnaType;    // 글 타입
-        TextView    tv_userId;   // 작성자명
+        TextView    tv_title;           // 제목
+        TextView    tv_contentType;     // 글 타입
+        TextView    tv_userId;          // 작성자명
+        TextView    tv_date;            // 작성시간
         ImageView   imageView;
 
         public ViewHolder(View itemView, final QnaClickListener listener) {
             super(itemView);
 
-            tv_title    = itemView.findViewById(R.id.tv_title);
-            tv_qnaType  = itemView.findViewById(R.id.tv_qnaType);
-            tv_userId   = itemView.findViewById(R.id.tv_userId);
-            imageView   = itemView.findViewById(R.id.imageView);
+            tv_title        = itemView.findViewById(R.id.tv_title);
+            tv_contentType  = itemView.findViewById(R.id.tv_contentType);
+            tv_userId       = itemView.findViewById(R.id.tv_userId);
+            tv_date         = itemView.findViewById(R.id.tv_date);
+            imageView       = itemView.findViewById(R.id.imageView);
 
             // Qna가 클릭 될 경우.
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +101,7 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
 
         public void setItem (Qna item) {
             tv_title.setText(item.getTitle());
-            tv_qnaType.setText(item.getQnaType());
+            tv_contentType.setText(item.getContentType());
             tv_userId.setText(item.getUserId());
         }
     }
