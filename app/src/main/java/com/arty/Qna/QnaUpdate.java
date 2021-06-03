@@ -1,9 +1,5 @@
 package com.arty.Qna;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,7 +14,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+
 import com.arty.R;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -40,14 +41,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-public class QnaWriteActivity extends AppCompatActivity {
+public class QnaUpdate extends AppCompatActivity {
+    boolean imageSwitch = false;
     private static String userId = "admin";
     static final String COLLECTION_NAME = "QNA_BOARD";
 
+    Qna qna;
 
     private TextView    title, contentType, content;
     private ImageView   image1;
-    public  Uri         imgUri, downloadURI;
+    public  Uri         imgURI, downloadURI;
 
     private FirebaseFirestore   db;
     private FirebaseStorage     storage;
@@ -58,9 +61,7 @@ public class QnaWriteActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_qna_write);
-        inputType(); // QnaPopup 액티비티에서 식물이아파요 or 식물이 궁금해요 선택한 정보를 화면에 뿌려준다.
+        setContentView(R.layout.qna_update);
 
         title           = findViewById(R.id.in_title);
         contentType     = findViewById(R.id.in_contentType);
@@ -70,28 +71,41 @@ public class QnaWriteActivity extends AppCompatActivity {
         image1.setDrawingCacheEnabled(true);
         image1.buildDrawingCache();
 
+        qna = (Qna) getIntent().getParcelableExtra("qna");
+        Log.d("QnaUpdate","업데이트 페이지 정보 ---> "+qna.toString());
+        Log.d("QnaUpdate","업데이트 페이지 이미지 스위치 ---> "+imageSwitch);
+
+        // 최초 정보
+        title.setText(qna.getTitle());
+        contentType.setText(qna.getContentType());
+        content.setText(qna.getContent());
+        Glide.with(this).load(qna.getImage1()).into(image1);
+
         findViewById(R.id.btn_update_qna).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(image1.getDrawable() == null) {
-                    Toast.makeText(QnaWriteActivity.this,"사진은 반드시 등록해야 합니다.",Toast.LENGTH_SHORT).show();
-                } else {
+                    Toast.makeText(QnaUpdate.this,"사진은 반드시 등록해야 합니다.",Toast.LENGTH_SHORT).show();
+                } else if(imageSwitch) {
+                    // 기존 이미지 삭제 및 신규 이미지 업로드
+                    deleteImage();
                     uploadImage();
-                    writeQna();
+                }else {
+                    // 기존 이미지 변경 없이 내용만 수정
+                    updateQna();
                 }
             }
         });
     }
 
     public void uploadImage() {
-        UploadTask uploadTask;
-        final String randomKey = UUID.randomUUID().toString();
-
         storage = FirebaseStorage.getInstance();
         storageReference =storage.getReference();
+        final String randomKey = UUID.randomUUID().toString();
 
         StorageReference childRef = storageReference.child(COLLECTION_NAME +"/"+randomKey);
-        uploadTask = childRef.putFile(imgUri);
+        UploadTask uploadTask;
+        uploadTask = childRef.putFile(imgURI);
 
         uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -115,8 +129,9 @@ public class QnaWriteActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Uri> task) {
                         if(task.isSuccessful()) {
+                            // 이미지 수정이 완료 되면 Cloud Firestore에 글 수정 시작
                             downloadURI = task.getResult();
-                            writeQna();
+                            updateQna();
                         }
                     }
                 });
@@ -129,7 +144,7 @@ public class QnaWriteActivity extends AppCompatActivity {
         });
     }
 
-    public void writeQna() {
+    public void updateQna() {
         db = FirebaseFirestore.getInstance();
         Qna qna = new Qna();
 
@@ -139,18 +154,24 @@ public class QnaWriteActivity extends AppCompatActivity {
             String str_content      = content.getText().toString();
             String uploadDate       = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
 
+            qna.setUuId(this.qna.getUuId());
             qna.setTitle(str_title);
             qna.setContentType(str_contentType);
             qna.setContent(str_content);
-            qna.setImage1(downloadURI.toString());
+            if(imageSwitch) {
+                qna.setImage1(downloadURI.toString());
+            } else {
+                qna.setImage1(this.qna.getImage1());
+            }
             qna.setUserId(userId);
             qna.setUploadDate(uploadDate);
 
             db.collection(COLLECTION_NAME)
-                    .add(qna)
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    .document(this.qna.getUuId())
+                    .set(qna)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
-                        public void onSuccess(DocumentReference documentReference) {
+                        public void onSuccess(Void unused) {
                             goToQnaMainActivity();
                         }
                     });
@@ -182,7 +203,7 @@ public class QnaWriteActivity extends AppCompatActivity {
                 if(photoFile != null) {
                     Uri photoURI = FileProvider.getUriForFile(this,"com.arty.Qna.fileprovider",photoFile);
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                    imgUri = photoURI;
+                    imgURI = photoURI;
                     startActivityForResult(intent,101);
                 }
 
@@ -234,8 +255,8 @@ public class QnaWriteActivity extends AppCompatActivity {
 
             } else if(requestCode == 201) {
                 // 사진 불러오기
-                imgUri = data.getData();
-                image1.setImageURI(imgUri);
+                imgURI = data.getData();
+                image1.setImageURI(imgURI);
             }
         }
     }
@@ -245,20 +266,32 @@ public class QnaWriteActivity extends AppCompatActivity {
         if(image1.getDrawable() == null) image1.setImageBitmap(bitmap);
     }
 
-    public void inputType() {
-        contentType = findViewById(R.id.in_contentType);
-        Intent intent = getIntent();
-        String data = intent.getStringExtra("type");
-
-        if(data.equals("1")) {
-            contentType.setText("식물이 아파요");
-        } else {
-            contentType.setText("식물이 궁금해요");
-        }
+    public void invisibleImage1 (View view) {
+        image1.setImageResource(0);
+        imageSwitch = true;
     }
 
-    public void deleteImage1 (View view) {
-        image1.setImageResource(0);
+    private void deleteImage() {
+        storage                     = FirebaseStorage.getInstance();
+        storageReference            = storage.getReference();
+
+        StorageReference imageUrlRef = storage.getReferenceFromUrl(qna.getImage1());
+        String fileName = imageUrlRef.getName();
+
+        StorageReference deleteRef  = storageReference.child(COLLECTION_NAME + "/" + fileName);
+
+        deleteRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("QanUpdate","사진 참 예뻤어요...");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("QanUpdate","사진 참 예뻤어요...");
+                e.printStackTrace();
+            }
+        });
     }
 
     public void toast(String str) {
@@ -273,5 +306,12 @@ public class QnaWriteActivity extends AppCompatActivity {
             result = false;
 
         return result;
+    }
+
+    // 업데이트 취소 버튼 클릭 이벤트
+    public void updateCancel(View view) {
+        Intent intent = new Intent(this, QnaMainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

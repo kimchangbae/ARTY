@@ -58,6 +58,7 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
         holder.tv_title.setText(qnaList.get(position).getTitle());
         holder.tv_contentType.setText(qnaList.get(position).getContentType());
         holder.tv_userId.setText(qnaList.get(position).getUserId());
+        holder.tv_uploadDate.setText(qnaList.get(position).getUploadDate());
 
         Glide.with(holder.itemView).load(qnaList.get(position).getImage1()).into(holder.imageView);
 
@@ -74,7 +75,7 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
         TextView    tv_title;           // 제목
         TextView    tv_contentType;     // 글 타입
         TextView    tv_userId;          // 작성자명
-        TextView    tv_date;            // 작성시간
+        TextView    tv_uploadDate;      // 작성시간
         ImageView   imageView;
 
         public ViewHolder(View itemView, final QnaClickListener listener) {
@@ -83,7 +84,7 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
             tv_title        = itemView.findViewById(R.id.tv_title);
             tv_contentType  = itemView.findViewById(R.id.tv_contentType);
             tv_userId       = itemView.findViewById(R.id.tv_userId);
-            tv_date         = itemView.findViewById(R.id.tv_date);
+            tv_uploadDate   = itemView.findViewById(R.id.tv_uploadDate);
             imageView       = itemView.findViewById(R.id.imageView);
 
             // Qna가 클릭 될 경우.

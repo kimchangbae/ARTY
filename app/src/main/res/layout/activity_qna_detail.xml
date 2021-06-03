@@ -7,28 +7,73 @@
     android:orientation="vertical"
     tools:context=".Qna.QnaDetailActivity">
 
-    <TextView
-        android:id="@+id/textView"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="제목" />
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="작성자" />
+        <Button
+            android:id="@+id/btn_x"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:onClick="backToHome"
+            android:text="X" />
 
-    <TextView
-        android:id="@+id/textView7"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="내용" />
+        <Button
+            android:id="@+id/btn_update"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:onClick="updateQna"
+            android:text="수정" />
 
-    <ImageView
-        android:id="@+id/imageView2"
+        <Button
+            android:id="@+id/btn_delete"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="삭제" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="제목"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="작성자"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="작성시간"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="내용"
+            android:textSize="30sp" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:srcCompat="@tools:sample/avatars" />
+
+    </LinearLayout>
 
 </LinearLayout>

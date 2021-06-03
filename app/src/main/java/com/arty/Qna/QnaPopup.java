@@ -26,6 +26,8 @@ public class QnaPopup extends Activity {
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
         layoutParams.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
         layoutParams.dimAmount = 0.7f;
+        layoutParams.height = 500;
+        layoutParams.width = 1000;
         getWindow().setAttributes(layoutParams);
 
         // 액티비티 바깥화면이 클릭되어도 종료되지 않게 설정하기
@@ -36,14 +38,14 @@ public class QnaPopup extends Activity {
         intent = new Intent(getApplicationContext(), QnaWriteActivity.class);
         intent.putExtra("type", "1");
         startActivityForResult(intent,1);
+        finish();
     }
-
     public void btnCuriousClick(View v) {
         intent = new Intent(getApplicationContext(), QnaWriteActivity.class);
         intent.putExtra("type", "2");
         startActivityForResult(intent,1);
+        finish();
     }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         //바깥레이어 클릭시 안닫히게

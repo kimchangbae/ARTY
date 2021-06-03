@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:onClick="updateCancel"
     android:orientation="vertical"
-    tools:context=".Qna.QnaWriteActivity">
+    tools:context=".Qna.QnaUpdate">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -101,10 +102,10 @@
 
         <ImageView
             android:id="@+id/imageView1"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:layout_weight="1"
-            android:onClick="deleteImage1"
+            android:onClick="invisibleImage1"
             tools:srcCompat="@tools:sample/avatars" />
 
     </LinearLayout>
@@ -113,12 +114,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="horizontal" />
+        android:gravity="bottom"
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/btn_update_qna"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="등록하기" />
+        <Button
+            android:id="@+id/btn_update_qna"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="수정하기" />
+
+        <Button
+            android:id="@+id/btn_update_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="updateCancel"
+            android:text="취소" />
+    </LinearLayout>
 
 </LinearLayout>

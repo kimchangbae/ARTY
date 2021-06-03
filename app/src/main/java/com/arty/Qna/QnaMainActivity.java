@@ -18,8 +18,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.core.OrderBy;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -68,7 +70,7 @@ public class QnaMainActivity extends AppCompatActivity implements Serializable {
         db = FirebaseFirestore.getInstance();
 
         collectionReference = db.collection(COLLECTION_NAME);
-        collectionReference
+        collectionReference.orderBy("uploadDate", Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -76,9 +78,10 @@ public class QnaMainActivity extends AppCompatActivity implements Serializable {
                         if(task.isSuccessful()) {
                             for(QueryDocumentSnapshot document : task.getResult()) {
                                 Qna qna = document.toObject(Qna.class);
+                                qna.setUuId(document.getId());
                                 qnaList.add(qna);
 
-                                Log.d(TAG, qna.toString());
+                                Log.d(TAG, "Call QNA_BOARD--->"+qna.toString());
                             }
                             qnaAdapter.notifyDataSetChanged();
                         }

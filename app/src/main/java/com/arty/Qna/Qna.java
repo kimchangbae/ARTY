@@ -10,23 +10,26 @@ import androidx.annotation.NonNull;
 import java.util.Date;
 
 public class Qna implements Parcelable {
+    private String  uuId;           // 글 key;
     private String  title;          // 제목
     private String  contentType;    // 글 속성(식물이 아파요 or 식물이 궁금해요)
     private String  userId;         // 글 작성자
-    private Date    date;           // 작성일자
+    private String  uploadDate;     // 작성일자
     private String  content;        // 내용
-    private String  image1;         // 첨부이미지1
-    private String  image2;         // 첨부이미지2
-    private String  image3;         // 첨부이미지3
+    private String  image1;         // 첨부이미지1(다운로드URL)
+    private String  image2;         // 첨부이미지2(다운로드URL)
+    private String  image3;         // 첨부이미지3(다운로드URL)
 
     public Qna() {
     }
 
     public Qna(Parcel parcel) {
+        this.uuId           = parcel.readString();
         this.title          = parcel.readString();
         this.contentType    = parcel.readString();
         this.userId         = parcel.readString();
         this.content        = parcel.readString();
+        this.uploadDate     = parcel.readString();
         this.image1         = parcel.readString();
     }
 
@@ -49,25 +52,36 @@ public class Qna implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.uuId);
         dest.writeString(this.title);
         dest.writeString(this.contentType);
         dest.writeString(this.userId);
         dest.writeString(this.content);
+        dest.writeString(this.uploadDate);
         dest.writeString(this.image1);
     }
 
     @Override
     public String toString() {
         return "Qna{" +
+                "uuid='" + uuId + '\'' +
                 "title='" + title + '\'' +
                 ", contentType='" + contentType + '\'' +
                 ", userId='" + userId + '\'' +
-                ", date=" + date +
+                ", uploadDate=" + uploadDate +
                 ", content='" + content + '\'' +
                 ", image1='" + image1 + '\'' +
                 ", image2='" + image2 + '\'' +
                 ", image3='" + image3 + '\'' +
                 '}';
+    }
+
+    public String getUuId() {
+        return uuId;
+    }
+
+    public void setUuId(String uuId) {
+        this.uuId = uuId;
     }
 
     public String getTitle() {
@@ -94,12 +108,12 @@ public class Qna implements Parcelable {
         this.userId = userId;
     }
 
-    public Date getDate() {
-        return date;
+    public String getUploadDate() {
+        return uploadDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setUploadDate(String uploadDate) {
+        this.uploadDate = uploadDate;
     }
 
     public String getContent() {
