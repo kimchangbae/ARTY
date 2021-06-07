@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.arty.R;
+import com.arty.User.MyPage;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -63,6 +64,11 @@ public class QnaMainActivity extends AppCompatActivity implements Serializable {
                 startActivity(intent);
             }
         });
+    }
+
+    public void goToMyPage(View view) {
+        Intent intent = new Intent(QnaMainActivity.this, MyPage.class);
+        startActivity(intent);
     }
 
     public void drawingRecyclerView() {

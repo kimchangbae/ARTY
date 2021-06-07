@@ -28,7 +28,6 @@
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
             android:layout_weight="1"
-            android:onClick="goToHome"
             android:text="홈"
             android:textSize="10sp"
             android:textStyle="bold"
@@ -42,49 +41,49 @@
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
             android:layout_weight="1"
-            android:text="AI진단"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            app:backgroundTint="#7D8284" />
-
-        <Button
-            android:id="@+id/btn_write_qna"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_weight="1"
             android:onClick="writeQna"
-            android:text="글쓰기"
+            android:text="진단"
             android:textSize="10sp"
             android:textStyle="bold"
             app:backgroundTint="#7D8284" />
 
         <Button
-            android:id="@+id/btn_book"
+            android:id="@+id/button10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
             android:layout_weight="1"
-            android:text="식물도감"
+            android:text="자랑"
             android:textSize="10sp"
             android:textStyle="bold"
             app:backgroundTint="#7D8284" />
 
         <Button
-            android:id="@+id/btn_free"
+            android:id="@+id/btn_market"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
             android:layout_weight="1"
-            android:text="자유게시판"
-            android:textSize="9sp"
+            android:text="마켓"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            app:backgroundTint="#7D8284" />
+
+        <Button
+            android:id="@+id/btn_myPage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:onClick="goToMyPage"
+            android:text="MY"
+            android:textSize="10sp"
             android:textStyle="bold"
             app:backgroundTint="#7D8284" />
     </LinearLayout>

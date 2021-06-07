@@ -65,7 +65,7 @@ public class QnaWriteActivity extends AppCompatActivity {
 
         title           = findViewById(R.id.in_title);
         contentType     = findViewById(R.id.in_contentType);
-        content         = findViewById(R.id.in_content);
+        content         = findViewById(R.id.edit_in_content);
         image1          = findViewById(R.id.imageView1);
 
         image1.setDrawingCacheEnabled(true);
