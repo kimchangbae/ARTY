@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="이메일"
+        android:text="admin@arty.co.kr"
         android:inputType="textPersonName" />
 
     <EditText
@@ -21,6 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
+        android:text="admin1"
         android:hint="패스워드"
         android:inputType="textPassword" />
 

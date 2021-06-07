@@ -5,9 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -18,6 +21,7 @@ import com.arty.Qna.QnaMainActivity;
 import com.arty.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,6 +33,7 @@ import com.kakao.auth.ISessionCallback;
 import com.kakao.network.ErrorResult;
 import com.kakao.sdk.auth.model.OAuthToken;
 import com.kakao.sdk.user.UserApiClient;
+import com.kakao.sdk.user.model.AccessTokenInfo;
 import com.kakao.sdk.user.model.User;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
@@ -38,6 +43,7 @@ import com.kakao.util.exception.KakaoException;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -52,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseFirestore   firebaseFirestore;
     private FirebaseAuth mAuth;
 
-    boolean isKakaoUser = false;
+    boolean isEmptyKakaoUser;
     private UserApiClient userApiClient;
     KakaoApplication kakaoApplication = new KakaoApplication();
 
@@ -63,9 +69,49 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
         common = new Common();
+    }
 
+    private long clickTime = 0;
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // 뒤로가기 버튼 클릭 시
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+
+
+            if(SystemClock.elapsedRealtime() - clickTime < 2000) {
+                Toast.makeText(getApplicationContext(), "프로그램이 종료 되었습니다.", Toast.LENGTH_SHORT).show();
+                killARTY();
+
+                return true;
+            }
+            clickTime = SystemClock.elapsedRealtime();
+            Toast.makeText(getApplicationContext(), "한번 더 누르면 종료 됩니다.", Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
+
+
+    protected void killARTY() {
+        super.onBackPressed();
+
+        Log.d(TAG, "뒤로가기");
+
+        // 태스크를 백그라운드로 이동
+        moveTaskToBack(true);
+
+        // 액티비티 종료 + 태스크 리스트에서 지우기
+        if (Build.VERSION.SDK_INT >= 21) {
+            finishAndRemoveTask();
+        } else {
+            finish();
+        }
+
+        // 앱 프로세스 종료
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     @Override
@@ -92,9 +138,6 @@ public class LoginActivity extends AppCompatActivity {
         TextView edit_lgn_pswd = findViewById(R.id.edit_lgn_pswd);
         String email = edit_lgn_email.getText().toString();
         String password = edit_lgn_pswd.getText().toString();
-
-        Log.d("UserJoin", "email : " + email);
-        Log.d("UserJoin", "password : " + password);
 
         if(common.validationEmail(email)) {
             try {
@@ -123,67 +166,79 @@ public class LoginActivity extends AppCompatActivity {
 
     // 카카오 로그인 버튼 클릭 이벤트
     public void btn_kakao_login(View view) {
-        userApiClient = UserApiClient.getInstance();
+        userApiClient       = UserApiClient.getInstance();
+
 
         // 사용자 기기에 카톡이 설치되어 있는지 확인.
-        boolean isInstallKaTalk = userApiClient.isKakaoTalkLoginAvailable(LoginActivity.this);
-        Log.d(TAG,"[카카오톡 설치여부----> " + isInstallKaTalk + "]");
-
-        if(isInstallKaTalk) {
-            // 카카오톡으로 로그인
-            //userApiClient.loginWithKakaoTalk(LoginActivity.this,callback);
-
+        if(userApiClient.isKakaoTalkLoginAvailable(LoginActivity.this)) {
+            Log.d(TAG,"[KAKAO TALK INSTALL OK]");
             // 카카오 계정으로 로그인
-            userApiClient.loginWithKakaoAccount(LoginActivity.this,kakaoApplication.callback2);
-        } else {
-            userApiClient.loginWithKakaoAccount(LoginActivity.this,callback);
+            userApiClient.loginWithKakaoAccount(LoginActivity.this, new Function2<OAuthToken, Throwable, Unit>() {
+                @Override
+                public Unit invoke(OAuthToken oAuthToken, Throwable throwable) {
+                    Log.d(TAG,"[CALL BACK]");
+                    if(oAuthToken != null) {
+                        UserApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
+                            @Override
+                            public Unit invoke(User user, Throwable throwable) {
+                                Log.d(TAG,"[ME CALL BACK]");
+                                if(user != null) {
+                                    Log.d(TAG, "카카오 사용자 등록여부(" +user.getId()+")");
+                                    Log.d(TAG, "카카오 사용자 정보(이메일 : " +user.getId()+")");
+                                    Log.d(TAG, "카카오 사용자 정보(이메일 : " +user.getKakaoAccount().getEmail()+")");
+
+                                    UserAccount userAccount = new UserAccount();
+                                    userAccount.setKakaoId(user.getId());
+                                    userAccount.setEmail(user.getKakaoAccount().getEmail());
+
+
+                                    firebaseFirestore   = FirebaseFirestore.getInstance();
+                                    firebaseFirestore
+                                            .collection(CollectionPath)
+                                            .whereEqualTo("kakaoId",user.getId())
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onComplete(Task<QuerySnapshot> task) {
+                                                    Intent intent;
+
+                                                    if(task.getResult().isEmpty()) {
+                                                        //신규 카톡 유저 처리
+                                                        Log.d(TAG,"등록되지 않은 카카오톡 유저 입니다.");
+                                                        intent = new Intent(LoginActivity.this, KakaoJoin.class);
+
+                                                        intent.putExtra("userAccount",userAccount);
+                                                        startActivity(intent);
+                                                    } else {
+                                                        //기존 카톡 유저 처리
+                                                        Log.d(TAG,"등록된 카카오톡 유저 입니다.");
+                                                        intent = new Intent(LoginActivity.this, QnaMainActivity.class);
+                                                        finish();
+                                                    }
+                                                    startActivity(intent);
+                                                }
+                                            });
+                                }
+                                if(throwable != null) {
+                                    Log.d(TAG, "카카오톡 사용자 정보 요청 실패!!" + throwable.getMessage());
+                                }
+                                return null;
+                            }
+                        });
+                    }
+                    if(throwable != null) {
+                        Log.d(TAG, "카카오 로그인 실패(throwable : " +throwable.getMessage()+")");
+                    }
+                    return null;
+                }
+            });
         }
     }
 
-    // 카카오 로그인 연동
-    Function2<OAuthToken, Throwable, Unit> callback = new Function2<OAuthToken, Throwable, Unit>() {
-
-        @Override
-        public Unit invoke(OAuthToken oAuthToken, Throwable throwable) {
-            Log.d(TAG,"[callback 호출]");
-            if(oAuthToken != null) {
-                UserApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
-                    @Override
-                    public Unit invoke(User user, Throwable throwable) {
-                        if(user != null) {
-                            Log.d(TAG, "카카오 사용자 정보(이메일 : " +user.getKakaoAccount().getEmail()+")");
-                            Log.d(TAG, "카카오 사용자 정보(닉네임 : " +user.getKakaoAccount().getProfile().getNickname()+")");
-
-                            if(!getUserDataForKakao(user)) {
-                                //setUserDataForKakao(user);
-                                //Intent intent = new Intent(LoginActivity.this,KakaoJoin.class);
-                                //startActivity(intent);
-                            } else {
-                                //goToMain();
-                            }
-                        }
-                        if(throwable != null) {
-                            Log.d(TAG, "카카오톡 사용자 정보 요청 실패!!");
-                        }
-                        return null;
-                    }
-                });
-
-                //Intent intent = new Intent(LoginActivity.this, QnaMainActivity.class);
-                //startActivityForResult(intent, 101);
-                //finish();
-            }
-            if(throwable != null) {
-                Log.d(TAG, "카카오 로그인 실패(throwable : " +throwable.getMessage()+")");
-            }
-            return null;
-        }
-    };
 
 
 
     public void setUserDataForKakao(User kakaoUser) {
-        firebaseFirestore = FirebaseFirestore.getInstance();
         final String randomKey = UUID.randomUUID().toString();
 
         UserAccount user = new UserAccount();
@@ -198,24 +253,23 @@ public class LoginActivity extends AppCompatActivity {
                 .set(user);
     }
 
-    public boolean getUserDataForKakao(User kakaoUser) {
-        firebaseFirestore = FirebaseFirestore.getInstance();
+    public boolean getUserDataForKakao(long kakaoId) {
         firebaseFirestore
-                .collection(CollectionPath)
-                .whereEqualTo("kakaoId",kakaoUser.getId())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if(task.isSuccessful()) {
-                            for(QueryDocumentSnapshot document : task.getResult()) {
-                                isKakaoUser = true;
-                                Log.d(TAG,"document --> " + document.getData());
-                            }
+            .collection(CollectionPath)
+            .whereEqualTo("kakaoId",kakaoId)
+            .get()
+            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if(task.isSuccessful()) {
+                        for(QueryDocumentSnapshot document : task.getResult()) {
+                            isEmptyKakaoUser = true;
+                            Log.d(TAG,"document --> " + document.getData());
                         }
                     }
-                });
-        return isKakaoUser;
+                }
+            });
+        return isEmptyKakaoUser;
     }
 
     public void userJoin(View view) {

@@ -1,10 +1,12 @@
 package com.arty.User;
 
-public class UserAccount {
-    String uId;         // uId
-    String userNm;     // 유저 아이디 (PK)
-    String email;       // 이메일
-    long kakaoId;
+import java.io.Serializable;
+
+public class UserAccount implements Serializable {
+    private String uId;         // uId
+    private String userNm;     // 유저 아이디 (PK)
+    private String email;       // 이메일
+    private long kakaoId;
 
     public String getuId() {
         return uId;

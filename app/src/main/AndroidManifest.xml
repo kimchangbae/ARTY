@@ -2,15 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.arty">
 
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="true" />
+    <uses-feature android:name="android.hardware.camera"
+                    android:required="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+                        android:maxSdkVersion="19" />
 
     <application
         android:name=".User.KakaoApplication"
@@ -19,21 +17,28 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity android:name=".User.KakaoJoin" />
-        <activity android:name=".User.MyPage" />
-        <activity android:name=".User.UserJoin" />
+        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+
         <activity android:name=".Main.MainActivity" />
+
+        <!-- USER -->
+        <activity android:name=".User.KakaoJoin" />
+        <activity android:name=".User.UserJoin" />
+        <activity android:name=".User.MyPage" />
+
+        <!-- QNA -->
         <activity android:name=".Qna.QnaMainActivity" />
         <activity android:name=".Qna.QnaWriteActivity" />
         <activity android:name=".Qna.QnaDetailActivity" />
         <activity android:name=".Qna.QnaUpdate" />
         <activity android:name=".Qna.QnaDelete" />
+        <activity android:name=".Qna.QnaPopup"
+                    android:theme="@android:style/Theme.Dialog" />
 
         <!-- Main Activity -->
-        <activity android:name=".User.LoginActivity">
+        <activity android:name=".User.LoginActivity" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -54,9 +59,7 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".Qna.QnaPopup"
-            android:theme="@android:style/Theme.Dialog" />
+
 
         <provider
             android:name="androidx.core.content.FileProvider"

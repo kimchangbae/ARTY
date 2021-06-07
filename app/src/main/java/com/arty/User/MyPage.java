@@ -52,11 +52,16 @@ public class MyPage extends AppCompatActivity {
             }
         });
     }
-    
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
     // 카카오톡 로그아웃
     public void kakaoTalkLogout() {
         userApiClient.logout(function);
-        userApiClient.unlink(function);
+        //userApiClient.unlink(function);
     }
 
     // 카카오톡 로그아웃 예외처리

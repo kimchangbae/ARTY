@@ -2,13 +2,13 @@ package com.arty.User;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatCheckBox;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,6 +35,16 @@ public class UserJoin extends AppCompatActivity {
 
     boolean userNm_result, email_result, pswd_result = false;
 
+    public int CHECK_AGREE_A = 0; // 1번 체크박스
+    public int CHECK_AGREE_1 = 0; // 1번 체크박스
+    public int CHECK_AGREE_2 = 0; // 2번 체크박스
+    public int CHECK_AGREE_3 = 0; // 3번 체크박스
+
+    AppCompatCheckBox checkBoxA;
+    AppCompatCheckBox checkBox1;
+    AppCompatCheckBox checkBox2;
+    AppCompatCheckBox checkBox3;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,9 +54,9 @@ public class UserJoin extends AppCompatActivity {
         firebaseFirestore = FirebaseFirestore.getInstance();
 
         email       = findViewById(R.id.edit_lgn_email);
-        userNm      = findViewById(R.id.edit_lgn_userNm);
+        userNm      = findViewById(R.id.edit_kakao_userNm);
 
-        Button btn_signUp = findViewById(R.id.btn_signUp);
+        Button btn_signUp = findViewById(R.id.btn_kakao_signUp);
         btn_signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -55,22 +65,11 @@ public class UserJoin extends AppCompatActivity {
                 }
             }
         });
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null) {
-            reload();
-        }
     }
 
     public void signUp(View view) {
-        EditText editText_email     = findViewById(R.id.edit_lgn_email);
-        EditText editText_pswd      = findViewById(R.id.edit_password);
+        TextView editText_email     = findViewById(R.id.edit_lgn_email);
+        TextView editText_pswd      = findViewById(R.id.edit_password);
         String email                = editText_email.getText().toString();
         String password             = editText_pswd.getText().toString();
 
@@ -110,7 +109,6 @@ public class UserJoin extends AppCompatActivity {
                 });
     }
 
-    private void reload(){}
 
     private void goToLogin() {
         Intent intent = new Intent(UserJoin.this, LoginActivity.class);
