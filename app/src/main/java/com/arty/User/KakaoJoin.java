@@ -1,58 +1,104 @@
 package com.arty.User;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.arty.Common.Common;
 import com.arty.Qna.QnaMainActivity;
 import com.arty.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.kakao.sdk.user.UserApiClient;
+import com.kakao.sdk.user.model.User;
 
-import org.w3c.dom.Text;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.functions.Function2;
 
 public class KakaoJoin extends AppCompatActivity {
     private static String TAG = "KakaoJoin";
     static String CollectionPath = "USER_ACCOUNT";
     final String randomKey = UUID.randomUUID().toString();
 
-    TextView edit_kakao_userNm;
-    boolean userNm_kakao_result = false;
-    private FirebaseFirestore   firebaseFirestore;
 
+    private FirebaseFirestore   mDB;
+    private UserApiClient userApiClient;
 
     UserAccount userAccount;
+
+    TextView userId;
+    boolean isUserIdOk = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kakao_join);
 
-        edit_kakao_userNm = findViewById(R.id.edit_kakao_userNm);
+        mDB = FirebaseFirestore.getInstance();
+        userApiClient = UserApiClient.getInstance();
 
-        userAccount = (UserAccount) getIntent().getSerializableExtra("userAccount");
+        userId = findViewById(R.id.edit_kakao_userId);
 
-
-        Button btn_kakao_signUp = findViewById(R.id.btn_kakao_signUp);
-        btn_kakao_signUp.setOnClickListener(new View.OnClickListener() {
+        Button btn_signUp = findViewById(R.id.btn_kakao_signUp);
+        btn_signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO 카카오유저 닉네임 정합성 체크 구현 해야됨
-                userAccount.setUserNm(edit_kakao_userNm.getText().toString());
-                singUpForKAKAO(userAccount.getKakaoId(), userAccount.getEmail());
+                if (validationUserId(view)) {
+                    userApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
+                        @Override
+                        public Unit invoke(User user, Throwable throwable) {
+                            userAccount = new UserAccount();
+                            userAccount.setUuId(randomKey);
+                            userAccount.setUserId(userId.getText().toString());
+                            userAccount.setKakaoId(user.getId());
+                            userAccount.setEmail(user.getKakaoAccount().getEmail());
+
+                            signUpForKakao(userAccount);
+                            return null;
+                        }
+                    });
+                } else {
+                    Toast.makeText(getApplicationContext(),"입력정보를 다시 확인하세요.",Toast.LENGTH_SHORT).show();
+                }
+                //userAccount.setUserId(userId.getText().toString());
+                //singUpForKakao(userAccount.getKakaoId(), userAccount.getEmail());
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        userId.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(isUserIdOk) {
+                    Log.d(TAG,"아이디 텍스트 체인지");
+                    isUserIdOk = false;
+                }
             }
         });
     }
@@ -65,32 +111,85 @@ public class KakaoJoin extends AppCompatActivity {
 
         // firebaseFirestore.terminate();
 
-        finish();
+        //finish();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        goToLogin("main");
+        Log.d(TAG,"카카오 조인에서 뒤로가기");
+
+        userApiClient.unlink(new Function1<Throwable, Unit>() {
+            @Override
+            public Unit invoke(Throwable throwable) {
+                Log.d("AuthApplication", "logoutFunction");
+
+                if(throwable != null) {
+                    Log.d(TAG,"----------------------------------------------------");
+                    Log.d("AuthApplication", "카카오톡 에러 발생" + throwable.getMessage());
+                    Log.d(TAG,"----------------------------------------------------");
+                }
+
+                return null;
+            }
+        });
+
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
-    private void singUpForKAKAO(long kakaoId, String kakaoEmail) {
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        firebaseFirestore
-                .collection(CollectionPath)
-                .document(randomKey)
-                .set(userAccount)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()) {
-                            goToLogin("login");
-                        }
+    private void signUpForKakao(UserAccount userAccount) {
+        mDB.collection(CollectionPath)
+            .document(userAccount.getUuId())
+            .set(userAccount)
+            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()) {
+                        goToActivity("login");
                     }
-                });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull @NotNull Exception e) {
+                e.getMessage();
+            }
+        });
     }
 
-    private void goToLogin(String path) {
+    // 카카오 사용자아이디 형식 체크
+    public boolean validationUserId(View view) {
+        TextView alertUserId = findViewById(R.id.alert_kakao_userId);
+        String strUserId        = userId.getText().toString();
+
+        if(strUserId == null || strUserId.isEmpty()) {
+            alertUserId.setText("닉네임을 입력하세요.");
+            alertUserId.setTextColor(Color.RED);
+        } else {
+            mDB.collection(CollectionPath)
+                    .whereEqualTo("userId",strUserId)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            Log.d(TAG,"validationUserId");
+                            if(task.getResult().getDocuments().isEmpty()) {
+                                isUserIdOk = true;
+                                alertUserId.setText("사용가능 합니다.");
+                                alertUserId.setTextColor(Color.YELLOW);
+                            } else {
+                                isUserIdOk = false;
+                                alertUserId.setText("사용할 수 없는 닉네임 입니다.");
+                                alertUserId.setTextColor(Color.RED);
+                            }
+                        }
+                    });
+        }
+        return isUserIdOk;
+    }
+
+    private void goToActivity(String path) {
         Intent intent = null;
 
         if(path != null && path.equals("login")) {
@@ -100,35 +199,5 @@ public class KakaoJoin extends AppCompatActivity {
         }
         startActivity(intent);
         finish();
-    }
-
-    public boolean validationUserNm(View view) {
-        TextView alert_kakao_userNm = findViewById(R.id.alert_kakao_userNm);
-        String str_userNm = edit_kakao_userNm.getText().toString();
-
-        if(str_userNm == null || str_userNm.isEmpty()) {
-            alert_kakao_userNm.setText("닉네임을 입력하세요.");
-            alert_kakao_userNm.setTextColor(Color.RED);
-        } else{
-            firebaseFirestore = FirebaseFirestore.getInstance();
-            firebaseFirestore
-                    .collection(CollectionPath)
-                    .whereEqualTo("userNm",str_userNm)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(Task<QuerySnapshot> task) {
-                            if(task.getResult().getDocuments().isEmpty()) {
-                                alert_kakao_userNm.setText("사용가능 합니다.");
-                                alert_kakao_userNm.setTextColor(Color.YELLOW);
-                                userNm_kakao_result = true;
-                            } else {
-                                alert_kakao_userNm.setText("사용할 수 없는 닉네임 입니다.");
-                                alert_kakao_userNm.setTextColor(Color.RED);
-                            }
-                        }
-                    });
-        }
-        return userNm_kakao_result;
     }
 }

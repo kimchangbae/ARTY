@@ -28,11 +28,11 @@
                 android:maxLength="23" />
 
             <Button
-                android:id="@+id/button8"
+                android:id="@+id/btn_chk_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="validationEmail"
-                android:text="중복" />
+                android:text="확인" />
         </LinearLayout>
 
         <TextView
@@ -47,7 +47,7 @@
             android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/edit_kakao_userNm"
+                android:id="@+id/edit_userId"
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -55,25 +55,25 @@
                 android:ems="10"
                 android:hint="닉네임"
                 android:inputType="textPersonName"
-                android:maxLength="8"
+                android:maxLength="6"
                 android:textSize="18sp" />
 
             <Button
-                android:id="@+id/button11"
+                android:id="@+id/btn_chk_userId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:onClick="validationUserNm"
-                android:text="중복" />
+                android:onClick="validationUserId"
+                android:text="확인" />
 
         </LinearLayout>
 
         <TextView
-            android:id="@+id/alert_userNm"
+            android:id="@+id/alert_userId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="한글,영어,숫자 혼용(10자리 이내)"
+            android:text="한글,영어,숫자 혼용(6자리 이내)"
             android:textColor="#676363" />
 
         <LinearLayout
@@ -83,7 +83,7 @@
             android:orientation="vertical">
 
             <EditText
-                android:id="@+id/edit_password"
+                android:id="@+id/edit_pswd"
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -97,7 +97,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="8~16자 영문자,숫자, 특수문자를 혼합한 비밀번호" />
+                android:text="8~16자 영문자,숫자, 특수문자를 혼합한 비밀번호"
+                android:textColor="#676363" />
 
             <EditText
                 android:id="@+id/edit_pswd_check"
@@ -107,13 +108,15 @@
                 android:ems="10"
                 android:hint="비밀번호확인"
                 android:inputType="textPassword"
-                android:maxLength="16" />
+                android:maxLength="16"
+                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/alert_pswd2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp" />
+                android:layout_marginLeft="10dp"
+                android:visibility="invisible" />
 
         </LinearLayout>
 
@@ -230,7 +233,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/btn_kakao_signUp"
+                android:id="@+id/btn_signUp"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:text="회원가입" />

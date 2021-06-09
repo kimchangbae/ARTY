@@ -14,7 +14,7 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/edit_kakao_userNm"
+            android:id="@+id/edit_kakao_userId"
             android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -26,17 +26,17 @@
             android:textSize="18sp" />
 
         <Button
-            android:id="@+id/button11"
+            android:id="@+id/btn_chk_userId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:onClick="validationUserNm"
+            android:onClick="validationUserId"
             android:text="중복" />
 
     </LinearLayout>
 
     <TextView
-        android:id="@+id/alert_kakao_userNm"
+        android:id="@+id/alert_kakao_userId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"

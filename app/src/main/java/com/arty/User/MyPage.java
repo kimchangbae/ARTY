@@ -23,7 +23,7 @@ public class MyPage extends AppCompatActivity {
     private static String TAG = "MyPage";
 
     private FirebaseAuth mAuth;
-    private UserApiClient userApiClient;
+    UserApiClient userApiClient;
 
     @Override
     protected void onPause() {
@@ -38,6 +38,7 @@ public class MyPage extends AppCompatActivity {
         setContentView(R.layout.activity_my_page);
 
         mAuth = FirebaseAuth.getInstance();
+        userApiClient = UserApiClient.getInstance();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user != null) {
@@ -48,7 +49,7 @@ public class MyPage extends AppCompatActivity {
 
         }
 
-        userApiClient = UserApiClient.getInstance();
+
         int hashCode = userApiClient.hashCode();
         Log.d("MyPage","MyPage.kakaoUser의 해쉬코드 [" +hashCode+ "]");
 
@@ -107,9 +108,6 @@ public class MyPage extends AppCompatActivity {
         userApiClient.me(new Function2<User, Throwable, Unit>() {
             @Override
             public Unit invoke(User user, Throwable throwable) {
-                Log.d(TAG,"----------------------------------------------------");
-                Log.d(TAG,"계정삭제 대상 : " + user.getKakaoAccount().getEmail());
-                Log.d(TAG,"----------------------------------------------------");
                 if(throwable != null) {
                     throwable.getMessage();
                 }
@@ -122,10 +120,12 @@ public class MyPage extends AppCompatActivity {
             public Unit invoke(Throwable throwable) {
                 Log.d("AuthApplication", "logoutFunction");
 
-                if(throwable != null)
+                if(throwable != null) {
                     Log.d(TAG,"----------------------------------------------------");
                     Log.d("AuthApplication", "카카오톡 에러 발생" + throwable.getMessage());
-                Log.d(TAG,"----------------------------------------------------");
+                    Log.d(TAG,"----------------------------------------------------");
+                }
+
                 return null;
             }
         });

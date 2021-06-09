@@ -29,7 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class QnaMainActivity extends AppCompatActivity implements Serializable {
+public class QnaMainActivity extends AppCompatActivity {
     static final String TO_DAY          = new SimpleDateFormat("yyMMdd").format(new Date(System.currentTimeMillis()));
     static final String TAG             = "QnaMainActivity";
     static final String COLLECTION_NAME = "QNA_BOARD";
@@ -68,6 +68,14 @@ public class QnaMainActivity extends AppCompatActivity implements Serializable {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // TODO 중지 또는 다른 화면에 있다 왔을 때 다시 리스트를 불러오는 동작이 필요
+
+
+    }
+
     private long clickTime = 0;
 
     @Override
@@ -88,6 +96,12 @@ public class QnaMainActivity extends AppCompatActivity implements Serializable {
         return false;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG,"QNA 메인페이지 디스트로이");
+    }
+
     protected void killARTY() {
         // 태스크를 백그라운드로 이동
         moveTaskToBack(true);
@@ -106,6 +120,7 @@ public class QnaMainActivity extends AppCompatActivity implements Serializable {
     public void goToMyPage(View view) {
         Intent intent = new Intent(QnaMainActivity.this, MyPage.class);
         startActivity(intent);
+        finish();
     }
 
     public void drawingRecyclerView() {

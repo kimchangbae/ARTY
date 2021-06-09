@@ -7,15 +7,18 @@ import androidx.appcompat.widget.AppCompatCheckBox;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arty.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,13 +30,15 @@ import java.util.regex.Pattern;
 
 public class UserJoin extends AppCompatActivity {
     final static String TAG = "UserJoin";
+    String pswdPattern = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&]).{8,15}.$";
+    String pswdPattern2 = "((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9가-힣]).{8,16})";
 
-    EditText userNm, email;
+    TextView userId, email, pswd;
     private FirebaseAuth mAuth;
-    private FirebaseFirestore firebaseFirestore;
+    private FirebaseFirestore mDB;
     final String CollectionPath = "USER_ACCOUNT";
 
-    boolean userNm_result, email_result, pswd_result = false;
+    boolean isEmailOk, isUserIdOk, isPswdOk = false;
 
     public int CHECK_AGREE_A = 0; // 1번 체크박스
     public int CHECK_AGREE_1 = 0; // 1번 체크박스
@@ -50,157 +55,200 @@ public class UserJoin extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_join);
 
-        mAuth = FirebaseAuth.getInstance();
-        firebaseFirestore = FirebaseFirestore.getInstance();
+        mAuth   = FirebaseAuth.getInstance();
+        mDB     = FirebaseFirestore.getInstance();
 
         email       = findViewById(R.id.edit_lgn_email);
-        userNm      = findViewById(R.id.edit_kakao_userNm);
+        userId      = findViewById(R.id.edit_userId);
+        pswd        = findViewById(R.id.edit_pswd);
 
-        Button btn_signUp = findViewById(R.id.btn_kakao_signUp);
+
+
+        Button btn_signUp = findViewById(R.id.btn_signUp);
         btn_signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(validationEmail(view) && validationUserNm(view) && validationPswd(view)) {
-                    signUp(view);
+                if (validationEmail(view) && validationUserId(view) && isPswdOk) {
+                    signUpToAuth();
+                } else {
+                    Toast.makeText(getApplicationContext(),"입력정보를 다시 확인하세요.",Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
-    public void signUp(View view) {
-        TextView editText_email     = findViewById(R.id.edit_lgn_email);
-        TextView editText_pswd      = findViewById(R.id.edit_password);
-        String email                = editText_email.getText().toString();
-        String password             = editText_pswd.getText().toString();
+    @Override
+    protected void onStart() {
+        super.onStart();
 
-        mAuth.createUserWithEmailAndPassword(email,password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
+        email.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void afterTextChanged(Editable s) {}
 
-                            signUpToFireStore(user.getUid());
-                        } else {
-                            Log.w("UserJoin", "Authentication Write:failure", task.getException());
-                        }
-                    }
-                });
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(isEmailOk) {
+                    Log.d(TAG,"이메일 텍스트 체인지");
+                    isEmailOk = false;
+                }
+            }
+        });
+
+        userId.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(isUserIdOk) {
+                    Log.d(TAG,"아이디 텍스트 체인지");
+                    isUserIdOk = false;
+                }
+            }
+        });
+
+
+        pswd.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                TextView alert_pswd = findViewById(R.id.alert_pswd);
+                if(Pattern.matches(pswdPattern2, pswd.getText().toString())) {
+                    Log.d(TAG,"validationPassword");
+                    isPswdOk = true;
+                    alert_pswd.setText("사용가능합니다.");
+                    alert_pswd.setTextColor(Color.YELLOW);
+                } else {
+                    isPswdOk = false;
+                    alert_pswd.setText("사용 불가능한 비밀번호 입니다.");
+                    alert_pswd.setTextColor(Color.RED);
+                }
+            }
+        });
     }
 
-    private void signUpToFireStore(String uId) {
+    private void signUpToAuth() {
+        String strEmail     = email.getText().toString();
+        String password     = pswd.getText().toString();
+
+        mAuth.createUserWithEmailAndPassword(strEmail,password)
+            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if(task.isSuccessful()) {
+                        Log.d(TAG,"Authentication 사용자 등록 성공");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        signUpToFirestore(user.getUid());
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.d("UserJoin", "Authentication 사용자 등록 실패" + e.getMessage());
+            }
+        });
+    }
+
+    private void signUpToFirestore(String uuId) {
         UserAccount user = new UserAccount();
-        user.setuId(uId);
-        user.setUserNm(userNm.getText().toString());
+        user.setUuId(uuId);
+        user.setUserId(userId.getText().toString());
         user.setEmail(email.getText().toString());
 
-        firebaseFirestore
-                .collection(CollectionPath)
-                .document(uId)
-                .set(user)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()) {
+        mDB.collection(CollectionPath)
+            .document(uuId)
+            .set(user)
+            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()) {
+                        Log.d(TAG,"파이어스토어 사용자 등록 성공");
+                        goToLoginActivity();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG,"파이어스토어 사용자 등록 실패 : " + e.getMessage());
+            }
+        });
+    }
 
-                            goToLogin();
+    // 이메일 형식 체크
+    public boolean validationEmail(View view) {
+        TextView alertEmail = findViewById(R.id.alert_email);
+        String strEmail     = email.getText().toString();
+
+        Pattern pattern = Patterns.EMAIL_ADDRESS;
+        if(pattern.matcher(strEmail).matches()) {
+            mDB.collection(CollectionPath)
+                .whereEqualTo("email",strEmail)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        Log.d(TAG,"validationEmail");
+                        if(task.getResult().getDocuments().isEmpty()) {
+                            isEmailOk = true;
+                            alertEmail.setText("사용가능한 이메일 입니다.");
+                            alertEmail.setTextColor(Color.YELLOW);
+                        } else {
+                            isEmailOk = false;
+                            alertEmail.setText("이미 존재하는 이메일 입니다.");
+                            alertEmail.setTextColor(Color.RED);
                         }
                     }
                 });
+        } else {
+            alertEmail.setText("이메일 형식을 다시 확인해주세요.");
+            alertEmail.setTextColor(Color.RED);
+        }
+        return isEmailOk;
     }
 
+    // 사용자아이디 형식 체크
+    public boolean validationUserId(View view) {
+        TextView alertUserId    = findViewById(R.id.alert_userId);
+        String strUserId        = userId.getText().toString();
 
-    private void goToLogin() {
+        if(strUserId == null || strUserId.isEmpty()) {
+            alertUserId.setText("닉네임을 입력하세요.");
+            alertUserId.setTextColor(Color.RED);
+        } else{
+            mDB.collection(CollectionPath)
+                .whereEqualTo("userId",strUserId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        Log.d(TAG,"validationUserId");
+                        if(task.getResult().getDocuments().isEmpty()) {
+                            isUserIdOk = true;
+                            alertUserId.setText("사용가능 합니다.");
+                            alertUserId.setTextColor(Color.YELLOW);
+                        } else {
+                            isUserIdOk = false;
+                            alertUserId.setText("사용할 수 없는 닉네임 입니다.");
+                            alertUserId.setTextColor(Color.RED);
+                        }
+                    }
+                });
+        }
+        return isUserIdOk;
+    }
+
+    private void goToLoginActivity() {
         Intent intent = new Intent(UserJoin.this, LoginActivity.class);
         startActivity(intent);
         finish();
     }
-
-    public boolean validationEmail(View view) {
-        TextView alert_email = findViewById(R.id.alert_email);
-        String str_email = email.getText().toString();
-        Pattern pattern = Patterns.EMAIL_ADDRESS;
-
-        if(pattern.matcher(str_email).matches()) {
-            firebaseFirestore = FirebaseFirestore.getInstance();
-            firebaseFirestore
-                    .collection(CollectionPath)
-                    .whereEqualTo("email",str_email)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if(task.getResult().getDocuments().isEmpty()) {
-                                alert_email.setText("사용가능한 이메일 입니다.");
-                                alert_email.setTextColor(Color.YELLOW);
-                                email_result = true;
-                            } else {
-                                alert_email.setText("이미 존재하는 이메일 입니다.");
-                                alert_email.setTextColor(Color.RED);
-                            }
-                        }
-                    });
-
-        } else {
-            alert_email.setText("이메일 형식을 다시 확인해주세요.");
-            alert_email.setTextColor(Color.RED);
-        }
-
-        return email_result;
-    }
-
-    public boolean validationUserNm(View view) {
-        TextView alert_userNm = findViewById(R.id.alert_userNm);
-        String str_userNm = userNm.getText().toString();
-
-        if(str_userNm == null || str_userNm.isEmpty()) {
-            alert_userNm.setText("닉네임을 입력하세요.");
-            alert_userNm.setTextColor(Color.RED);
-        } else{
-            firebaseFirestore = FirebaseFirestore.getInstance();
-            firebaseFirestore
-                    .collection(CollectionPath)
-                    .whereEqualTo("userNm",str_userNm)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if(task.getResult().getDocuments().isEmpty()) {
-                                alert_userNm.setText("사용가능 합니다.");
-                                alert_userNm.setTextColor(Color.YELLOW);
-                                userNm_result = true;
-                            } else {
-                                alert_userNm.setText("사용할 수 없는 닉네임 입니다.");
-                                alert_userNm.setTextColor(Color.RED);
-                            }
-                        }
-                    });
-        }
-        return userNm_result;
-    }
-
-    public boolean validationPswd(View view) {
-        TextView alert_pswd2 = findViewById(R.id.alert_pswd2);
-        TextView pswd = findViewById(R.id.edit_password);
-        TextView pswd_check = findViewById(R.id.edit_pswd_check);
-
-        String str_pswd = pswd.getText().toString();
-        String str_pswd_check = pswd_check.getText().toString();
-
-        if(!str_pswd.equals(str_pswd_check)) {
-            alert_pswd2.setText("비밀번호가 일치하지 않습니다.");
-            alert_pswd2.setTextColor(Color.RED);
-        } else if(str_pswd.length() < 8) {
-            alert_pswd2.setText("비밀번호가 너무 짧습니다.");
-            alert_pswd2.setTextColor(Color.RED);
-        } else {
-            alert_pswd2.setText("사용가능한 비밀번호 입니다.");
-            alert_pswd2.setTextColor(Color.YELLOW);
-            pswd_result = true;
-        }
-
-        return pswd_result;
-    }
-
 
 }

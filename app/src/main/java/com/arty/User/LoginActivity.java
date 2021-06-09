@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arty.Common.Common;
+import com.arty.Main.MainActivity;
 import com.arty.Qna.QnaMainActivity;
 import com.arty.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,19 +30,23 @@ import com.kakao.sdk.user.model.AccessTokenInfo;
 import com.kakao.sdk.user.model.User;
 
 
+import java.util.function.Function;
+
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 
 public class LoginActivity extends AppCompatActivity {
     private static String TAG = "LoginActivity";
-    final String CollectionPath = "USER_ACCOUNT";
+    final static String COLLECTION_PATH = "USER_ACCOUNT";
+    private long clickTime = 0;
 
-    private FirebaseFirestore   firebaseFirestore;
-    private FirebaseAuth mAuth;
+    private FirebaseFirestore   mDB;
+    private FirebaseAuth        mAuth;
 
     private UserApiClient userApiClient;
 
     public Common common;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,17 +54,43 @@ public class LoginActivity extends AppCompatActivity {
 
         common = new Common();
         mAuth = FirebaseAuth.getInstance();
-        firebaseFirestore = FirebaseFirestore.getInstance();
+        mDB = FirebaseFirestore.getInstance();
         userApiClient = UserApiClient.getInstance();
-
-
-        onStart();
-
-        setContentView(R.layout.activity_login);
-
     }
 
-    private long clickTime = 0;
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // 1차 파이어베이스 유저 체크
+        if (mAuth.getCurrentUser() != null) {
+            Log.d(TAG, "파이어베이스 유저정보 ----------> [" + mAuth.getCurrentUser().getEmail() + "]");
+            goToMain();
+        } else {
+            // 2차 카카오톡 유저 체크
+            Log.d(TAG, "----------------------------------------------------");
+            Log.d(TAG, "LoginActivity - 파이어베이스 유저정보 없음");
+            Log.d(TAG, "----------------------------------------------------");
+
+            userApiClient.accessTokenInfo(new Function2<AccessTokenInfo, Throwable, Unit>() {
+                @Override
+                public Unit invoke(AccessTokenInfo accessTokenInfo, Throwable throwable) {
+                    if (accessTokenInfo != null) {
+                        Log.d(TAG, "카카오톡 유저정보 ----------> [" + accessTokenInfo + "]");
+                        goToMain();
+                    } else {
+                        // 3차 로그인 뷰 생성
+                        Log.d(TAG, "----------------------------------------------------");
+                        Log.d(TAG, "LoginActivity - 카카오톡 유저정보 없음");
+                        Log.d(TAG, "----------------------------------------------------");
+
+                        setContentView(R.layout.activity_login);
+                    }
+                    return null;
+                }
+            });
+        }
+    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -79,6 +110,10 @@ public class LoginActivity extends AppCompatActivity {
         return false;
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 
     protected void killARTY() {
         // 태스크를 백그라운드로 이동
@@ -95,36 +130,13 @@ public class LoginActivity extends AppCompatActivity {
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 
-    public void onStart() {
-        super.onStart();
-
-        // 파이어베이스 유저 체크
-        if (mAuth.getCurrentUser() != null) {
-            Log.d(TAG, "파이어베이스 유저정보 ----------> [" + mAuth.getCurrentUser().getEmail() + "]");
-            goToMain();
-        } else {
-            Log.d(TAG, "----------------------------------------------------");
-            Log.d(TAG, "LoginActivity - 파이어베이스 유저정보 없음");
-            Log.d(TAG, "----------------------------------------------------");
-        }
-
-        // 카톡 유저 체크
-        userApiClient.accessTokenInfo(new Function2<AccessTokenInfo, Throwable, Unit>() {
-            @Override
-            public Unit invoke(AccessTokenInfo accessTokenInfo, Throwable throwable) {
-
-                if (accessTokenInfo != null) {
-                    Log.d(TAG, "카카오톡 유저정보 ----------> [" + accessTokenInfo + "]");
-                    goToMain();
-                } else {
-                    Log.d(TAG, "----------------------------------------------------");
-                    Log.d(TAG, "LoginActivity - 카카오톡 유저정보 없음");
-                    Log.d(TAG, "----------------------------------------------------");
-                }
-                return null;
-            }
-        });
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG,"LOGIN 메인페이지 디스트로이");
+        finish();
     }
+
 
     public void goToMain() {
         Intent intent = new Intent(LoginActivity.this, QnaMainActivity.class);
@@ -199,6 +211,7 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d(TAG,"[콜백 함수 호출]");
                         Log.d(TAG,"oAuthToken : "+oAuthToken);
                         Log.d(TAG,"----------------------------------------------------");
+
                         UserApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
                             @Override
                             public Unit invoke(User user, Throwable throwable) {
@@ -210,42 +223,34 @@ public class LoginActivity extends AppCompatActivity {
                                     Log.d(TAG, "카카오 사용자 정보[" +user+"]");
                                     Log.d(TAG,"----------------------------------------------------");
 
-                                    UserAccount userAccount = new UserAccount();
-                                    userAccount.setKakaoId(user.getId());
-                                    userAccount.setEmail(user.getKakaoAccount().getEmail());
+                                    mDB.collection(COLLECTION_PATH)
+                                        .whereEqualTo("kakaoId",user.getId())
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(Task<QuerySnapshot> task) {
+                                                Intent intent;
 
+                                                if(task.getResult().isEmpty()) {
+                                                    //신규 카톡 유저 처리
+                                                    Log.d(TAG,"----------------------------------------------------");
+                                                    Log.d(TAG,"등록되지 않은 카카오톡 유저 입니다.");
+                                                    Log.d(TAG,"----------------------------------------------------");
+                                                    intent = new Intent(LoginActivity.this, KakaoJoin.class);
 
-                                    firebaseFirestore   = FirebaseFirestore.getInstance();
-                                    firebaseFirestore
-                                            .collection(CollectionPath)
-                                            .whereEqualTo("kakaoId",user.getId())
-                                            .get()
-                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onComplete(Task<QuerySnapshot> task) {
-                                                    Intent intent;
-
-                                                    if(task.getResult().isEmpty()) {
-                                                        //신규 카톡 유저 처리
-                                                        Log.d(TAG,"----------------------------------------------------");
-                                                        Log.d(TAG,"등록되지 않은 카카오톡 유저 입니다.");
-                                                        Log.d(TAG,"----------------------------------------------------");
-                                                        intent = new Intent(LoginActivity.this, KakaoJoin.class);
-
-                                                        intent.putExtra("userAccount",userAccount);
-                                                        startActivity(intent);
-                                                        finish();
-                                                    } else {
-                                                        //기존 카톡 유저 처리
-                                                        Log.d(TAG,"----------------------------------------------------");
-                                                        Log.d(TAG,"등록된 카카오톡 유저 입니다.");
-                                                        Log.d(TAG,"----------------------------------------------------");
-                                                        intent = new Intent(LoginActivity.this, QnaMainActivity.class);
-                                                        finish();
-                                                    }
                                                     startActivity(intent);
+                                                    finish();
+                                                } else {
+                                                    //기존 카톡 유저 처리
+                                                    Log.d(TAG,"----------------------------------------------------");
+                                                    Log.d(TAG,"등록된 카카오톡 유저 입니다.");
+                                                    Log.d(TAG,"----------------------------------------------------");
+                                                    intent = new Intent(LoginActivity.this, QnaMainActivity.class);
+                                                    finish();
                                                 }
-                                            });
+                                                startActivity(intent);
+                                            }
+                                        });
                                 }
                                 if(throwable != null) {
                                     Log.d(TAG,"----------------------------------------------------");

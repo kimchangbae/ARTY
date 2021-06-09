@@ -2,26 +2,26 @@ package com.arty.User;
 
 import java.io.Serializable;
 
-public class UserAccount implements Serializable {
-    private String uId;         // uId
-    private String userNm;     // 유저 아이디 (PK)
+public class UserAccount {
+    private String uuId;         // uId
+    private String userId;     // 유저 아이디 (PK)
     private String email;       // 이메일
     private long kakaoId;
 
-    public String getuId() {
-        return uId;
+    public String getUuId() {
+        return uuId;
     }
 
-    public void setuId(String uId) {
-        this.uId = uId;
+    public void setUuId(String uuId) {
+        this.uuId = uuId;
     }
 
-    public String getUserNm() {
-        return userNm;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUserNm(String userNm) {
-        this.userNm = userNm;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getEmail() {
