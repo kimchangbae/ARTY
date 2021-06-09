@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.arty.Common.Common;
+import com.arty.Qna.QnaMainActivity;
 import com.arty.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -24,7 +25,8 @@ import org.w3c.dom.Text;
 import java.util.UUID;
 
 public class KakaoJoin extends AppCompatActivity {
-    final String CollectionPath = "USER_ACCOUNT";
+    private static String TAG = "KakaoJoin";
+    static String CollectionPath = "USER_ACCOUNT";
     final String randomKey = UUID.randomUUID().toString();
 
     TextView edit_kakao_userNm;
@@ -48,10 +50,9 @@ public class KakaoJoin extends AppCompatActivity {
         btn_kakao_signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(validationUserNm(view)) {
-                    userAccount.setUserNm(edit_kakao_userNm.getText().toString());
-                    singUpForKAKAO(userAccount.getKakaoId(), userAccount.getEmail());
-                }
+                // TODO 카카오유저 닉네임 정합성 체크 구현 해야됨
+                userAccount.setUserNm(edit_kakao_userNm.getText().toString());
+                singUpForKAKAO(userAccount.getKakaoId(), userAccount.getEmail());
             }
         });
     }
@@ -62,12 +63,19 @@ public class KakaoJoin extends AppCompatActivity {
 
         Log.d("KakaoJoin","[KakaoJoin.onPause]");
 
-        firebaseFirestore.terminate();
+        // firebaseFirestore.terminate();
 
         finish();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        goToLogin("main");
+    }
+
     private void singUpForKAKAO(long kakaoId, String kakaoEmail) {
+        firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseFirestore
                 .collection(CollectionPath)
                 .document(randomKey)
@@ -76,15 +84,20 @@ public class KakaoJoin extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()) {
-
-                            goToLogin();
+                            goToLogin("login");
                         }
                     }
                 });
     }
 
-    private void goToLogin() {
-        Intent intent = new Intent(KakaoJoin.this, LoginActivity.class);
+    private void goToLogin(String path) {
+        Intent intent = null;
+
+        if(path != null && path.equals("login")) {
+            intent = new Intent(KakaoJoin.this, LoginActivity.class);
+        } else if (path != null && path.equals("main")){
+            intent = new Intent(KakaoJoin.this, QnaMainActivity.class);
+        }
         startActivity(intent);
         finish();
     }

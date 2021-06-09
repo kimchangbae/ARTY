@@ -4,27 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="bottom"
+    android:orientation="vertical"
     tools:context=".User.LoginActivity">
 
     <EditText
         android:id="@+id/edit_lgn_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:cursorVisible="true"
         android:ems="10"
+        android:fontFamily="sans-serif"
+        android:hapticFeedbackEnabled="false"
         android:hint="이메일"
-        android:text="admin@arty.co.kr"
-        android:inputType="textPersonName" />
+        android:inputType="textPersonName"
+        android:singleLine="false"
+        android:text="admin@arty.co.kr" />
 
     <EditText
         android:id="@+id/edit_lgn_pswd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:text="admin1"
         android:hint="패스워드"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:text="admin1" />
 
     <Button
         android:id="@+id/btn_login"
@@ -59,6 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="findPassword"
             android:text="비밀번호찾기" />
     </LinearLayout>
 

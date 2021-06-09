@@ -20,9 +20,18 @@ import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
 
 public class MyPage extends AppCompatActivity {
+    private static String TAG = "MyPage";
 
     private FirebaseAuth mAuth;
     private UserApiClient userApiClient;
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        firebaseLogout();
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,14 +49,27 @@ public class MyPage extends AppCompatActivity {
         }
 
         userApiClient = UserApiClient.getInstance();
+        int hashCode = userApiClient.hashCode();
+        Log.d("MyPage","MyPage.kakaoUser의 해쉬코드 [" +hashCode+ "]");
 
 
         Button btn_logout = findViewById(R.id.btn_logout);
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                firebaseLogout(v);
+                // 사용자 로그아웃
+                Log.d(TAG,"로그아웃");
                 kakaoTalkLogout();
+                goToMain();
+            }
+        });
+
+        Button btn_delete_user = findViewById(R.id.btn_delete_user);
+        btn_delete_user.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 회원탈퇴
+                kakaoTalkUnlink();
                 goToMain();
             }
         });
@@ -60,25 +82,61 @@ public class MyPage extends AppCompatActivity {
 
     // 카카오톡 로그아웃
     public void kakaoTalkLogout() {
-        userApiClient.logout(function);
-        //userApiClient.unlink(function);
+        userApiClient = UserApiClient.getInstance();
+        userApiClient.logout(new Function1<Throwable, Unit>() {
+            @Override
+            public Unit invoke(Throwable throwable) {
+                Log.d(TAG,"----------------------------------------------------");
+                Log.d("AuthApplication", "logoutFunction");
+                Log.d(TAG,"----------------------------------------------------");
+
+                if(throwable != null) {
+                    Log.d(TAG,"----------------------------------------------------");
+                    Log.d("AuthApplication", "카카오톡 에러 발생" + throwable.getMessage());
+                    Log.d(TAG,"----------------------------------------------------");
+                }
+
+                return null;
+            }
+        });
     }
 
-    // 카카오톡 로그아웃 예외처리
-    Function1<Throwable, Unit> function = new Function1<Throwable, Unit>() {
-        @Override
-        public Unit invoke(Throwable throwable) {
-            if(throwable != null)
-                Log.d("MyPage", "카카오톡 에러 발생" + throwable.getMessage());
-            return null;
-        }
-    };
+    //
+    public void kakaoTalkUnlink(){
+        userApiClient = UserApiClient.getInstance();
+        userApiClient.me(new Function2<User, Throwable, Unit>() {
+            @Override
+            public Unit invoke(User user, Throwable throwable) {
+                Log.d(TAG,"----------------------------------------------------");
+                Log.d(TAG,"계정삭제 대상 : " + user.getKakaoAccount().getEmail());
+                Log.d(TAG,"----------------------------------------------------");
+                if(throwable != null) {
+                    throwable.getMessage();
+                }
+                return null;
+            }
 
-    public void firebaseLogout(View view) {
-        Log.d("MyPage", "파이어베이스 로그아웃");
+        });
+        userApiClient.unlink(new Function1<Throwable, Unit>() {
+            @Override
+            public Unit invoke(Throwable throwable) {
+                Log.d("AuthApplication", "logoutFunction");
+
+                if(throwable != null)
+                    Log.d(TAG,"----------------------------------------------------");
+                    Log.d("AuthApplication", "카카오톡 에러 발생" + throwable.getMessage());
+                Log.d(TAG,"----------------------------------------------------");
+                return null;
+            }
+        });
+    }
+
+
+    public void firebaseLogout() {
         mAuth.getInstance().signOut();
-
-        goToMain();
+        Log.d(TAG,"----------------------------------------------------");
+        Log.d("MyPage", "파이어베이스 로그아웃");
+        Log.d(TAG,"----------------------------------------------------");
     }
 
     private void goToMain() {

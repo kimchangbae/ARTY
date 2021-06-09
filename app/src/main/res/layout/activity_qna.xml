@@ -86,5 +86,6 @@
             android:textSize="10sp"
             android:textStyle="bold"
             app:backgroundTint="#7D8284" />
+
     </LinearLayout>
 </LinearLayout>
