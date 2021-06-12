@@ -14,7 +14,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.kakao.sdk.user.UserApiClient;
 import com.kakao.sdk.user.model.User;
 
-import kotlin.Function;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
@@ -29,13 +28,12 @@ public class MyPage extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         firebaseLogout();
-
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_page);
+        setContentView(R.layout.user_my_page);
 
         mAuth = FirebaseAuth.getInstance();
         userApiClient = UserApiClient.getInstance();
@@ -54,7 +52,7 @@ public class MyPage extends AppCompatActivity {
         Log.d("MyPage","MyPage.kakaoUser의 해쉬코드 [" +hashCode+ "]");
 
 
-        Button btn_logout = findViewById(R.id.btn_logout);
+        Button btn_logout = findViewById(R.id.btn_logout_b);
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,7 +63,7 @@ public class MyPage extends AppCompatActivity {
             }
         });
 
-        Button btn_delete_user = findViewById(R.id.btn_delete_user);
+        Button btn_delete_user = findViewById(R.id.btn_delete_user_b);
         btn_delete_user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,7 +138,7 @@ public class MyPage extends AppCompatActivity {
     }
 
     private void goToMain() {
-        Intent intent = new Intent(MyPage.this, LoginActivity.class);
+        Intent intent = new Intent(MyPage.this, Login.class);
         startActivity(intent);
         finish();
     }

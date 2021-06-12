@@ -15,14 +15,16 @@ import android.widget.Toast;
 
 import com.arty.Common.Common;
 import com.arty.Main.MainActivity;
-import com.arty.Qna.QnaMainActivity;
+import com.arty.Qna.QnaMain;
 import com.arty.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.kakao.sdk.auth.model.OAuthToken;
 import com.kakao.sdk.user.UserApiClient;
@@ -30,13 +32,13 @@ import com.kakao.sdk.user.model.AccessTokenInfo;
 import com.kakao.sdk.user.model.User;
 
 
-import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 
-public class LoginActivity extends AppCompatActivity {
-    private static String TAG = "LoginActivity";
+public class Login extends AppCompatActivity {
+    private static String TAG = "Login";
     final static String COLLECTION_PATH = "USER_ACCOUNT";
     private long clickTime = 0;
 
@@ -47,15 +49,14 @@ public class LoginActivity extends AppCompatActivity {
 
     public Common common;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         common = new Common();
-        mAuth = FirebaseAuth.getInstance();
-        mDB = FirebaseFirestore.getInstance();
-        userApiClient = UserApiClient.getInstance();
+        mAuth           = FirebaseAuth.getInstance();
+        mDB             = FirebaseFirestore.getInstance();
+        userApiClient   = UserApiClient.getInstance();
     }
 
     @Override
@@ -65,31 +66,79 @@ public class LoginActivity extends AppCompatActivity {
         // 1차 파이어베이스 유저 체크
         if (mAuth.getCurrentUser() != null) {
             Log.d(TAG, "파이어베이스 유저정보 ----------> [" + mAuth.getCurrentUser().getEmail() + "]");
-            goToMain();
+            Log.d(TAG, "파이어베이스 TenantId ----------> [" + mAuth.getCurrentUser().getTenantId()+ "]");
+
+            getUserIdAndGo(mAuth.getCurrentUser().getEmail());
         } else {
             // 2차 카카오톡 유저 체크
             Log.d(TAG, "----------------------------------------------------");
-            Log.d(TAG, "LoginActivity - 파이어베이스 유저정보 없음");
+            Log.d(TAG, "Login - 파이어베이스 유저정보 없음");
             Log.d(TAG, "----------------------------------------------------");
 
             userApiClient.accessTokenInfo(new Function2<AccessTokenInfo, Throwable, Unit>() {
                 @Override
                 public Unit invoke(AccessTokenInfo accessTokenInfo, Throwable throwable) {
                     if (accessTokenInfo != null) {
-                        Log.d(TAG, "카카오톡 유저정보 ----------> [" + accessTokenInfo + "]");
-                        goToMain();
+                        Log.d(TAG, "카카오톡 유저정보 ----------> [" + accessTokenInfo.getId() + "]");
+                        getUserIdAndGo2(accessTokenInfo.getId());
                     } else {
                         // 3차 로그인 뷰 생성
                         Log.d(TAG, "----------------------------------------------------");
-                        Log.d(TAG, "LoginActivity - 카카오톡 유저정보 없음");
+                        Log.d(TAG, "Login - 카카오톡 유저정보 없음");
                         Log.d(TAG, "----------------------------------------------------");
 
-                        setContentView(R.layout.activity_login);
+                        setContentView(R.layout.user_login);
                     }
                     return null;
                 }
             });
         }
+    }
+
+    private void getUserIdAndGo(String email) {
+        mDB = FirebaseFirestore.getInstance();
+        mDB.collection(COLLECTION_PATH)
+            .whereEqualTo("email",email)
+            .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        mAuth.setTenantId((String) document.getData().get("userId"));
+                        Log.d(TAG, "조회한 사용자 아이디 : " + mAuth.getTenantId());
+                        goToMain();
+                    }
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.e(TAG,"UserId Searching Fail... \n" + e.getMessage());
+            }
+        });
+    }
+
+    private void getUserIdAndGo2(long kakaoId) {
+        mDB = FirebaseFirestore.getInstance();
+        mDB.collection(COLLECTION_PATH)
+                .whereEqualTo("kakaoId",kakaoId)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        mAuth.setTenantId((String) document.getData().get("userId"));
+                        Log.d(TAG, "조회한 사용자 아이디 : " + mAuth.getTenantId());
+                        goToMain();
+                    }
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.e(TAG,"UserId Searching Fail... \n" + e.getMessage());
+            }
+        });
     }
 
     @Override
@@ -108,11 +157,6 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "한번 더 누르면 종료 됩니다.", Toast.LENGTH_SHORT).show();
         }
         return false;
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     protected void killARTY() {
@@ -139,7 +183,8 @@ public class LoginActivity extends AppCompatActivity {
 
 
     public void goToMain() {
-        Intent intent = new Intent(LoginActivity.this, QnaMainActivity.class);
+        Intent intent = new Intent(Login.this, MainActivity.class);
+        //Intent intent = new Intent(Login.this, QnaMain.class);
         startActivity(intent);
         finish();
     }
@@ -152,34 +197,30 @@ public class LoginActivity extends AppCompatActivity {
         String password = edit_lgn_pswd.getText().toString();
 
         if(common.validationEmail(email)) {
-            try {
-                mAuth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if(task.isSuccessful()) {
-                                    Log.d("UserJoin", "로그인 성공");
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    Log.d("UserJoin","currentUser --->" + user.getEmail());
-                                    goToMain();
-                                } else {
-                                    Toast.makeText(getApplicationContext(),"이메일과 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-            } catch(Exception e) {
-                Toast.makeText(getApplicationContext(),"이메일 형식을 확인하세요.", Toast.LENGTH_SHORT).show();
-            }
+            mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(Task<AuthResult> task) {
+                        if(task.isSuccessful()) {
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Log.d(TAG,"로그인 성공  --->" + user.getEmail());
+                            getUserIdAndGo(user.getEmail());
+                        } else {
+                            Toast.makeText(getApplicationContext(),"이메일과 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
         } else {
             Toast.makeText(getApplicationContext(),"이메일 형식을 확인하세요.", Toast.LENGTH_SHORT).show();
         }
+
 
     }
 
     // 카카오 로그인 버튼 클릭 이벤트
     public void btn_kakao_login(View view) {
         userApiClient       = UserApiClient.getInstance();
-
+/*
         userApiClient.accessTokenInfo(new Function2<AccessTokenInfo, Throwable, Unit>() {
             @Override
             public Unit invoke(AccessTokenInfo accessTokenInfo, Throwable throwable) {
@@ -191,18 +232,11 @@ public class LoginActivity extends AppCompatActivity {
                 return null;
             }
         });
-
+*/
         // 사용자 기기에 카톡이 설치되어 있는지 확인.
-        if(userApiClient.isKakaoTalkLoginAvailable(LoginActivity.this)) {
-            int hashCode = userApiClient.hashCode();
-            Log.d(TAG,"----------------------------------------------------");
-            Log.d(TAG,TAG+".카카오 사용자 해쉬코드 [" +hashCode+ "]");
-            Log.d(TAG,"----------------------------------------------------");
-
-            // 카카오 계정으로 로그인
-            //userApiClient.loginWithKakaoAccount(LoginActivity.this, new Function2<OAuthToken, Throwable, Unit>() {
+        if(userApiClient.isKakaoTalkLoginAvailable(Login.this)) {
             // 카카오톡으로 로그인
-            userApiClient.loginWithKakaoTalk(LoginActivity.this, new Function2<OAuthToken, Throwable, Unit>() {
+            userApiClient.loginWithKakaoTalk(Login.this, new Function2<OAuthToken, Throwable, Unit>() {
 
                 @Override
                 public Unit invoke(OAuthToken oAuthToken, Throwable throwable) {
@@ -236,8 +270,7 @@ public class LoginActivity extends AppCompatActivity {
                                                     Log.d(TAG,"----------------------------------------------------");
                                                     Log.d(TAG,"등록되지 않은 카카오톡 유저 입니다.");
                                                     Log.d(TAG,"----------------------------------------------------");
-                                                    intent = new Intent(LoginActivity.this, KakaoJoin.class);
-
+                                                    intent = new Intent(Login.this, KakaoJoin.class);
                                                     startActivity(intent);
                                                     finish();
                                                 } else {
@@ -245,10 +278,15 @@ public class LoginActivity extends AppCompatActivity {
                                                     Log.d(TAG,"----------------------------------------------------");
                                                     Log.d(TAG,"등록된 카카오톡 유저 입니다.");
                                                     Log.d(TAG,"----------------------------------------------------");
-                                                    intent = new Intent(LoginActivity.this, QnaMainActivity.class);
-                                                    finish();
+
+                                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                                        mAuth.setTenantId((String) document.getData().get("userId"));
+                                                        Log.d(TAG, "조회한 사용자 아이디 : " + mAuth.getTenantId());
+
+                                                        goToMain();
+                                                    }
                                                 }
-                                                startActivity(intent);
+
                                             }
                                         });
                                 }

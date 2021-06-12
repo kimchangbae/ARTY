@@ -20,6 +20,10 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
 
     QnaClickListener listener;
 
+    public QnaAdapter(ArrayList<Qna> qnaLists) {
+        this.qnaList = qnaLists;
+    }
+
     public QnaAdapter(ArrayList<Qna> qnaLists, Context context) {
         this.qnaList = qnaLists;
         this.context = context;
@@ -48,7 +52,7 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
     @Override
     public QnaAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        View itemView = layoutInflater.inflate(R.layout.qnalist_item, parent, false);
+        View itemView = layoutInflater.inflate(R.layout.qna_list_item, parent, false);
 
         return new ViewHolder(itemView, listener);
     }

@@ -12,22 +12,22 @@ import android.widget.TextView;
 import com.arty.R;
 import com.bumptech.glide.Glide;
 
-public class QnaDetailActivity extends AppCompatActivity {
+public class QnaDetail extends AppCompatActivity {
     Qna qna;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_qna_detail);
+        setContentView(R.layout.qna_detail);
 
         qna = (Qna) getIntent().getParcelableExtra("qna");
-        Log.d("QnaDetailActivity","상세페이지 정보 ---> "+qna.toString());
+        Log.d("QnaDetail","상세페이지 정보 ---> "+qna.toString());
 
         TextView tv_title       = findViewById(R.id.textView);
         TextView tv_contentType = findViewById(R.id.textView5);
         TextView tv_content     = findViewById(R.id.textView7);
         TextView tv_uploadDate  = findViewById(R.id.textView8);
-        ImageView imageView     = findViewById(R.id.imageView2);
+        ImageView imageView     = findViewById(R.id.img_detail_1);
 
         tv_title.setText(qna.getTitle());
         tv_contentType.setText(qna.getContentType());
@@ -37,9 +37,10 @@ public class QnaDetailActivity extends AppCompatActivity {
     }
 
     public void backToHome(View view) {
-        Intent intent = new Intent(this,QnaMainActivity.class);
-        startActivity(intent);
-        finish();
+        onBackPressed();
+        //Intent intent = new Intent(this, QnaMain.class);
+        //startActivity(intent);
+        //finish();
     }
 
     public void updateQna(View view) {

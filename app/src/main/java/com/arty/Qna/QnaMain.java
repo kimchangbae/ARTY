@@ -24,14 +24,13 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class QnaMainActivity extends AppCompatActivity {
+public class QnaMain extends AppCompatActivity {
     static final String TO_DAY          = new SimpleDateFormat("yyMMdd").format(new Date(System.currentTimeMillis()));
-    static final String TAG             = "QnaMainActivity";
+    static final String TAG             = "QnaMain";
     static final String COLLECTION_NAME = "QNA_BOARD";
 
     private RecyclerView                recyclerView;
@@ -48,32 +47,20 @@ public class QnaMainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_qna);
+        setContentView(R.layout.qna_main);
 
-        recyclerView = findViewById(R.id.qnaRecyclerView);
+        recyclerView = findViewById(R.id.qnaView);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
         drawingRecyclerView();
-
-        qnaAdapter.setQnaClickListener(new QnaClickListener() {
-            @Override
-            public void onQnaClick(QnaAdapter.ViewHolder holder, View view, int position) {
-                Intent intent = new Intent(getApplicationContext(), QnaDetailActivity.class);
-                Qna qna = qnaAdapter.getItems(position);
-                intent.putExtra("qna",qna);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         // TODO 중지 또는 다른 화면에 있다 왔을 때 다시 리스트를 불러오는 동작이 필요
-
-
     }
 
     private long clickTime = 0;
@@ -118,7 +105,7 @@ public class QnaMainActivity extends AppCompatActivity {
     }
 
     public void goToMyPage(View view) {
-        Intent intent = new Intent(QnaMainActivity.this, MyPage.class);
+        Intent intent = new Intent(QnaMain.this, MyPage.class);
         startActivity(intent);
         finish();
     }
@@ -128,7 +115,8 @@ public class QnaMainActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         collectionReference = db.collection(COLLECTION_NAME);
-        collectionReference.orderBy("uploadDate", Query.Direction.DESCENDING)
+        collectionReference
+                .orderBy("uploadDate", Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

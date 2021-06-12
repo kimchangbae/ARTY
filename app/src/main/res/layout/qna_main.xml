@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF"
     android:orientation="vertical"
-    tools:context=".Qna.QnaMainActivity">
+    tools:context=".Qna.QnaMain">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,7 +26,7 @@
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/qnaRecyclerView"
+        android:id="@+id/qnaView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
@@ -38,10 +38,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#170367F4"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        tools:visibility="invisible">
 
         <Button
-            android:id="@+id/btn_home"
+            android:id="@+id/btn_home_b"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
@@ -54,7 +55,7 @@
             app:backgroundTint="#7D8284" />
 
         <Button
-            android:id="@+id/btn_AI"
+            android:id="@+id/btn_AI_b"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
@@ -81,7 +82,7 @@
             app:backgroundTint="#7D8284" />
 
         <Button
-            android:id="@+id/btn_market"
+            android:id="@+id/btn_market_b"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
@@ -94,7 +95,7 @@
             app:backgroundTint="#7D8284" />
 
         <Button
-            android:id="@+id/btn_myPage"
+            android:id="@+id/btn_myPage_b"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"

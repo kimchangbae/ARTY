@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import com.arty.Main.MainActivity;
 import com.arty.R;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
@@ -25,7 +26,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -63,8 +63,8 @@ public class QnaUpdate extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.qna_update);
 
-        title           = findViewById(R.id.in_title);
-        contentType     = findViewById(R.id.in_contentType);
+        title           = findViewById(R.id.edit_title);
+        contentType     = findViewById(R.id.edit_contentType);
         content         = findViewById(R.id.in_content);
         image1          = findViewById(R.id.imageView1);
 
@@ -81,7 +81,7 @@ public class QnaUpdate extends AppCompatActivity {
         content.setText(qna.getContent());
         Glide.with(this).load(qna.getImage1()).into(image1);
 
-        findViewById(R.id.btn_update_qna).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_write_qna).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(image1.getDrawable() == null) {
@@ -111,7 +111,7 @@ public class QnaUpdate extends AppCompatActivity {
             @Override
             public void onProgress(UploadTask.TaskSnapshot snapshot) {
                 double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
-                Log.d("QnaWriteActivity", "Upload is " + progress + "% done");
+                Log.d("QnaWrite", "Upload is " + progress + "% done");
                 Toast.makeText(getApplicationContext(),"사진을"+progress+"%업로드 중입니다.",Toast.LENGTH_SHORT).show();
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -183,7 +183,7 @@ public class QnaUpdate extends AppCompatActivity {
     }
 
     public void goToQnaMainActivity() {
-        Intent intent = new Intent(this, QnaMainActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
@@ -313,8 +313,9 @@ public class QnaUpdate extends AppCompatActivity {
 
     // 업데이트 취소 버튼 클릭 이벤트
     public void updateCancel(View view) {
-        Intent intent = new Intent(this, QnaMainActivity.class);
-        startActivity(intent);
-        finish();
+        onBackPressed();
+        //Intent intent = new Intent(this, QnaMain.class);
+        //startActivity(intent);
+        //finish();
     }
 }

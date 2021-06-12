@@ -14,11 +14,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.arty.Qna.QnaMainActivity;
+import com.arty.Main.MainActivity;
+import com.arty.Qna.QnaMain;
 import com.arty.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.kakao.sdk.user.UserApiClient;
@@ -39,9 +41,10 @@ public class KakaoJoin extends AppCompatActivity {
 
 
     private FirebaseFirestore   mDB;
-    private UserApiClient userApiClient;
+    private FirebaseAuth        mAuth;
+    private UserApiClient       userApiClient;
 
-    UserAccount userAccount;
+    UserAccount                 userAccount;
 
     TextView userId;
     boolean isUserIdOk = false;
@@ -49,7 +52,7 @@ public class KakaoJoin extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_kakao_join);
+        setContentView(R.layout.user_kakao_join);
 
         mDB = FirebaseFirestore.getInstance();
         userApiClient = UserApiClient.getInstance();
@@ -69,7 +72,7 @@ public class KakaoJoin extends AppCompatActivity {
                             userAccount.setUserId(userId.getText().toString());
                             userAccount.setKakaoId(user.getId());
                             userAccount.setEmail(user.getKakaoAccount().getEmail());
-
+                            mAuth.setTenantId(userId.getText().toString());
                             signUpForKakao(userAccount);
                             return null;
                         }
@@ -134,7 +137,7 @@ public class KakaoJoin extends AppCompatActivity {
             }
         });
 
-        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        Intent intent = new Intent(getApplicationContext(), Login.class);
         startActivity(intent);
         finish();
     }
@@ -147,12 +150,12 @@ public class KakaoJoin extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()) {
-                        goToActivity("login");
+                        goToActivity("main");
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onFailure(@NonNull @NotNull Exception e) {
+            public void onFailure(Exception e) {
                 e.getMessage();
             }
         });
@@ -193,9 +196,9 @@ public class KakaoJoin extends AppCompatActivity {
         Intent intent = null;
 
         if(path != null && path.equals("login")) {
-            intent = new Intent(KakaoJoin.this, LoginActivity.class);
+            intent = new Intent(KakaoJoin.this, Login.class);
         } else if (path != null && path.equals("main")){
-            intent = new Intent(KakaoJoin.this, QnaMainActivity.class);
+            intent = new Intent(KakaoJoin.this, MainActivity.class);
         }
         startActivity(intent);
         finish();

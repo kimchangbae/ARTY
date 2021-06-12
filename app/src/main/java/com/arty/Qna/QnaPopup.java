@@ -35,13 +35,13 @@ public class QnaPopup extends Activity {
     }
 
     public void btnSickClick(View v) {
-        intent = new Intent(getApplicationContext(), QnaWriteActivity.class);
+        intent = new Intent(getApplicationContext(), QnaWrite.class);
         intent.putExtra("type", "1");
         startActivityForResult(intent,1);
         finish();
     }
     public void btnCuriousClick(View v) {
-        intent = new Intent(getApplicationContext(), QnaWriteActivity.class);
+        intent = new Intent(getApplicationContext(), QnaWrite.class);
         intent.putExtra("type", "2");
         startActivityForResult(intent,1);
         finish();

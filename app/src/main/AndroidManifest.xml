@@ -27,16 +27,16 @@
         <activity android:name=".User.MyPage" />
 
         <!-- QNA -->
-        <activity android:name=".Qna.QnaMainActivity" />
-        <activity android:name=".Qna.QnaWriteActivity" />
-        <activity android:name=".Qna.QnaDetailActivity" />
+        <activity android:name=".Qna.QnaMain" />
+        <activity android:name=".Qna.QnaWrite" />
+        <activity android:name=".Qna.QnaDetail" />
         <activity android:name=".Qna.QnaUpdate" />
         <activity android:name=".Qna.QnaDelete" />
         <activity android:name=".Qna.QnaPopup"
                     android:theme="@android:style/Theme.Dialog" />
 
         <!-- Main Activity -->
-        <activity android:name=".User.LoginActivity" >
+        <activity android:name=".User.Login" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

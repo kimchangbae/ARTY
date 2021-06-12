@@ -53,7 +53,7 @@ public class UserJoin extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_join);
+        setContentView(R.layout.user_join);
 
         mAuth   = FirebaseAuth.getInstance();
         mDB     = FirebaseFirestore.getInstance();
@@ -246,7 +246,7 @@ public class UserJoin extends AppCompatActivity {
     }
 
     private void goToLoginActivity() {
-        Intent intent = new Intent(UserJoin.this, LoginActivity.class);
+        Intent intent = new Intent(UserJoin.this, Login.class);
         startActivity(intent);
         finish();
     }

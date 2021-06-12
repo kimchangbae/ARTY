@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Qna.QnaDetailActivity">
+    tools:context=".Qna.QnaDetail">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,7 +13,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btn_x"
+            android:id="@+id/btn_udt_cancel"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:onClick="backToHome"
@@ -70,7 +70,7 @@
             android:textSize="30sp" />
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/img_detail_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:srcCompat="@tools:sample/avatars" />

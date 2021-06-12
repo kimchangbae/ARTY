@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#FFFFFF"
+    tools:context=".Navigation.NavigationBottom">
+
+    <Button
+        android:id="@+id/btn_main"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="홈"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btn_ai"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="AI진단"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btn_free"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="자랑"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btn_market"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="마켓"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btn_myPage"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="MY"
+        android:textSize="16sp" />
+</LinearLayout>

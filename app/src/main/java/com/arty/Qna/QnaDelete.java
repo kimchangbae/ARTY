@@ -5,18 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.arty.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 public class QnaDelete extends AppCompatActivity {
     static final String COLLECTION_NAME = "QNA_BOARD";
@@ -80,7 +75,7 @@ public class QnaDelete extends AppCompatActivity {
     }
 
     public void goToHome() {
-        Intent intent = new Intent(this, QnaMainActivity.class);
+        Intent intent = new Intent(this, QnaMain.class);
         startActivity(intent);
         finish();
     }
