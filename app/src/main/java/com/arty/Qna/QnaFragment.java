@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,7 +34,7 @@ public class QnaFragment extends Fragment {
     static final String COLLECTION_NAME = "QNA_BOARD";
     static final String TAG             = "QnaFragment";
 
-
+    private SwipeRefreshLayout              swipeRefreshLayout = null;
     private QnaAdapter                      qnaAdapter;
     private RecyclerView.LayoutManager      layoutManager;
     private ArrayList<Qna>                  qnaList;
@@ -49,6 +50,8 @@ public class QnaFragment extends Fragment {
 
         mDB = FirebaseFirestore.getInstance();
 
+        swipeRefreshLayout = rootView.findViewById(R.id.refreshQnaFragment);
+
         recyclerView = rootView.findViewById(R.id.freeBoardView);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(inflater.getContext());
@@ -63,6 +66,15 @@ public class QnaFragment extends Fragment {
     public void onStart() {
         Log.d(TAG,"큐앤에이 onStart");
         super.onStart();
+        
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.d(TAG,"QNA 게시판 새로고침");
+                drawingRecyclerView();
+
+            }
+        });
 
         qnaAdapter.setQnaClickListener(new QnaClickListener() {
             @Override
@@ -153,5 +165,6 @@ public class QnaFragment extends Fragment {
 
         qnaAdapter = new QnaAdapter(qnaList);
         recyclerView.setAdapter(qnaAdapter); // 리싸이클러뷰에 어댑터 연결
+        swipeRefreshLayout.setRefreshing(false);
     }
 }
