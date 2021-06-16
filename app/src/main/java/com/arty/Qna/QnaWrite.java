@@ -147,12 +147,6 @@ public class QnaWrite extends QnaCommon {
         }
     }
 
-    private void distributeImage() {
-        qna.setImage1(uris[0] != null ? String.valueOf(uris[0]) : null);
-        qna.setImage2(uris[1] != null ? String.valueOf(uris[1]) : null);
-        qna.setImage3(uris[2] != null ? String.valueOf(uris[2]) : null);
-    }
-
     private void goToMainActivity() {
         progressDialog.dismiss();
         Intent intent = new Intent(QnaWrite.this, MainActivity.class);

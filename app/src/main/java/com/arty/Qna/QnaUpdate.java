@@ -15,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.arty.Main.MainActivity;
 import com.arty.R;
 import com.bumptech.glide.Glide;
@@ -27,6 +29,8 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -184,6 +188,9 @@ public class QnaUpdate extends QnaCommon {
                         Log.d(TAG,i+"번째 변동없음");
                     }
                 }
+                if(writeFinish == 0) {
+                    goToDetailActivity();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 goToMainActivity();
@@ -191,6 +198,7 @@ public class QnaUpdate extends QnaCommon {
         }
     }
 
+    // 이미지 수정 작업
     private void updateImage(String filePath, String documentPath, int index) {
         StorageReference childRef = storage.getReference().child(filePath+ "/" + index);
         UploadTask uploadTask = childRef.putFile(uris[index]);
@@ -219,6 +227,7 @@ public class QnaUpdate extends QnaCommon {
         });
     }
 
+    // 이미지 삭제 작업
     private void deleteImage(String filePath, String documentPath, int index) {
         StorageReference deleteRef  = storage.getReference().child(filePath+ "/" + index);
         deleteRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -268,7 +277,12 @@ public class QnaUpdate extends QnaCommon {
             mDB
             .collection(COLLECTION_NAME)
             .document(this.qna.getUuId())
-            .update(map);
+            .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(Task<Void> task) {
+                    if(writeFinish == 0) goToDetailActivity();
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
