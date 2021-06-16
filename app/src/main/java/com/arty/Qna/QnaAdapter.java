@@ -1,6 +1,7 @@
 package com.arty.Qna;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,10 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
         return qnaList.get(position);
     }
 
+    public String getUuid(int position) {
+        return qnaList.get(position).getUuId();
+    }
+
     public void setItem (int position, Qna item) {
         qnaList.set(position, item);
     }
@@ -59,14 +64,15 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(QnaAdapter.ViewHolder holder, int position) {
-        holder.tv_title.setText(qnaList.get(position).getTitle());
+        holder.tv_content.setText(qnaList.get(position).getContent());
         holder.tv_contentType.setText(qnaList.get(position).getContentType());
         holder.tv_userId.setText(qnaList.get(position).getUserId());
-        holder.tv_uploadDate.setText(qnaList.get(position).getUploadDate());
-
         Glide.with(holder.itemView).load(qnaList.get(position).getImage1()).into(holder.imageView);
 
-        //Qna item = qnaLists.get(position);
+
+        holder.tv_uploadDate.setText(qnaList.get(position).getUploadDate());
+
+        //FreeBoard item = qnaLists.get(position);
         //holder.setItem(item);
     }
 
@@ -76,7 +82,7 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder{
-        TextView    tv_title;           // 제목
+        TextView    tv_content;         // 제목
         TextView    tv_contentType;     // 글 타입
         TextView    tv_userId;          // 작성자명
         TextView    tv_uploadDate;      // 작성시간
@@ -85,7 +91,7 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
         public ViewHolder(View itemView, final QnaClickListener listener) {
             super(itemView);
 
-            tv_title        = itemView.findViewById(R.id.tv_title);
+            tv_content      = itemView.findViewById(R.id.tv_content);
             tv_contentType  = itemView.findViewById(R.id.tv_contentType);
             tv_userId       = itemView.findViewById(R.id.tv_userId);
             tv_uploadDate   = itemView.findViewById(R.id.tv_uploadDate);
@@ -96,7 +102,7 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
                 @Override
                 public void onClick(View view) {
                     int position = getAdapterPosition();
-
+                    Log.d("QnaAdapter","position " + position + " 클릭 됨.");
                     if(listener != null) {
                         listener.onQnaClick(ViewHolder.this, view, position);
                     }
@@ -105,7 +111,7 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
         }
 
         public void setItem (Qna item) {
-            tv_title.setText(item.getTitle());
+            tv_content.setText(item.getContent());
             tv_contentType.setText(item.getContentType());
             tv_userId.setText(item.getUserId());
         }

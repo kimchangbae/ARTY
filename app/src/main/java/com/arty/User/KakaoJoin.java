@@ -15,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arty.Main.MainActivity;
-import com.arty.Qna.QnaMain;
 import com.arty.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -58,32 +57,6 @@ public class KakaoJoin extends AppCompatActivity {
         userApiClient = UserApiClient.getInstance();
 
         userId = findViewById(R.id.edit_kakao_userId);
-
-        Button btn_signUp = findViewById(R.id.btn_kakao_signUp);
-        btn_signUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (validationUserId(view)) {
-                    userApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
-                        @Override
-                        public Unit invoke(User user, Throwable throwable) {
-                            userAccount = new UserAccount();
-                            userAccount.setUuId(randomKey);
-                            userAccount.setUserId(userId.getText().toString());
-                            userAccount.setKakaoId(user.getId());
-                            userAccount.setEmail(user.getKakaoAccount().getEmail());
-                            mAuth.setTenantId(userId.getText().toString());
-                            signUpForKakao(userAccount);
-                            return null;
-                        }
-                    });
-                } else {
-                    Toast.makeText(getApplicationContext(),"입력정보를 다시 확인하세요.",Toast.LENGTH_SHORT).show();
-                }
-                //userAccount.setUserId(userId.getText().toString());
-                //singUpForKakao(userAccount.getKakaoId(), userAccount.getEmail());
-            }
-        });
     }
 
     @Override
@@ -102,6 +75,32 @@ public class KakaoJoin extends AppCompatActivity {
                     Log.d(TAG,"아이디 텍스트 체인지");
                     isUserIdOk = false;
                 }
+            }
+        });
+
+        Button btn_signUp = findViewById(R.id.btn_kakao_signUp);
+        btn_signUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (validationUserId(view)) {
+                    userApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
+                        @Override
+                        public Unit invoke(User user, Throwable throwable) {
+                            userAccount = new UserAccount();
+                            userAccount.setUuId(randomKey);
+                            userAccount.setUserId(userId.getText().toString());
+                            userAccount.setKakaoId(user.getId());
+                            userAccount.setEmail(user.getKakaoAccount().getEmail());
+                            // mAuth.setTenantId(userId.getText().toString());
+                            signUpForKakao(userAccount);
+                            return null;
+                        }
+                    });
+                } else {
+                    Toast.makeText(getApplicationContext(),"입력정보를 다시 확인하세요.",Toast.LENGTH_SHORT).show();
+                }
+                //userAccount.setUserId(userId.getText().toString());
+                //singUpForKakao(userAccount.getKakaoId(), userAccount.getEmail());
             }
         });
     }

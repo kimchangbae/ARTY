@@ -23,6 +23,7 @@
             android:id="@+id/btn_logout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="userLogout"
             android:text="로그아웃"
             android:textSize="20sp" />
 
@@ -30,6 +31,7 @@
             android:id="@+id/btn_withdraw"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="userWithdraw"
             android:text="탈퇴하기"
             android:textSize="20sp" />
 

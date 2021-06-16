@@ -22,6 +22,7 @@
                 android:id="@+id/imageView"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
+                android:scaleType="fitXY"
                 app:srcCompat="@android:drawable/ic_menu_gallery" />
 
             <LinearLayout
@@ -31,13 +32,13 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_title"
+                    android:id="@+id/tv_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
                     android:gravity="left"
-                    android:text="제목"
+                    android:text="내용"
                     android:textColor="#000000"
                     android:textSize="20sp" />
 

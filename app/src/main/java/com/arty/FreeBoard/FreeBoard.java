@@ -1,18 +1,11 @@
-package com.arty.Qna;
+package com.arty.FreeBoard;
 
-import android.media.Image;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import java.util.Date;
-
-public class Qna implements Parcelable {
+public class FreeBoard implements Parcelable {
     private String  uuId;           // Document Key(PK);
-    private String  contentType;    // 글 속성(식물이 아파요 or 식물이 궁금해요)
     private String  userId;         // 글 작성자
     private String  uploadDate;     // 작성일자
     private String  content;        // 내용
@@ -21,9 +14,8 @@ public class Qna implements Parcelable {
     private String  image3;         // 첨부이미지3(다운로드URL)
     private String  filePath;       // storage 이미지 저장경로
 
-    public Qna(Parcel parcel) {
+    public FreeBoard(Parcel parcel) {
         this.uuId           = parcel.readString();
-        this.contentType    = parcel.readString();
         this.userId         = parcel.readString();
         this.content        = parcel.readString();
         this.uploadDate     = parcel.readString();
@@ -33,19 +25,19 @@ public class Qna implements Parcelable {
         this.filePath       = parcel.readString();
     }
 
-    public static final Parcelable.Creator<Qna> CREATOR = new Parcelable.Creator<Qna>() {
+    public static final Creator<FreeBoard> CREATOR = new Creator<FreeBoard>() {
         @Override
-        public Qna createFromParcel(Parcel source) {
-            return new Qna(source);
+        public FreeBoard createFromParcel(Parcel source) {
+            return new FreeBoard(source);
         }
 
         @Override
-        public Qna[] newArray(int size) {
-            return new Qna[size];
+        public FreeBoard[] newArray(int size) {
+            return new FreeBoard[size];
         }
     };
 
-    public Qna() {
+    public FreeBoard() {
 
     }
 
@@ -57,7 +49,6 @@ public class Qna implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.uuId);
-        dest.writeString(this.contentType);
         dest.writeString(this.userId);
         dest.writeString(this.content);
         dest.writeString(this.uploadDate);
@@ -65,14 +56,12 @@ public class Qna implements Parcelable {
         dest.writeString(this.image2);
         dest.writeString(this.image3);
         dest.writeString(this.filePath);
-        //dest.writeArray(this.uris);
     }
 
     @Override
     public String toString() {
-        return "QNA{" +
+        return "FreeBoard{" +
                 "uuid='" + uuId + '\'' +
-                ", contentType='" + contentType + '\'' +
                 ", userId='" + userId + '\'' +
                 ", uploadDate=" + uploadDate +
                 ", content='" + content + '\'' +
@@ -89,14 +78,6 @@ public class Qna implements Parcelable {
 
     public void setUuId(String uuId) {
         this.uuId = uuId;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
     }
 
     public String getUserId() {

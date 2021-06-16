@@ -13,12 +13,7 @@ public class Common extends Activity {
 
     final String randomKey = UUID.randomUUID().toString();
 
-    public boolean validationEmail(String email) {
-        if(Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            return true;
-        }
-        return false;
-    }
+
 
     protected void killARTY() {
         // 태스크를 백그라운드로 이동

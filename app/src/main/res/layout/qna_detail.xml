@@ -23,7 +23,6 @@
             android:id="@+id/btn_update"
             android:layout_width="70dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"
             android:onClick="updateQna"
             android:text="수정" />
 
@@ -31,50 +30,65 @@
             android:id="@+id/btn_delete"
             android:layout_width="70dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"
             android:onClick="deleteQna"
             android:text="삭제" />
     </LinearLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/textView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="제목"
-            android:textSize="30sp" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="작성자"
-            android:textSize="30sp" />
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="작성자"
+                android:textSize="30sp" />
 
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="작성시간"
-            android:textSize="30sp" />
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="작성시간"
+                android:textSize="30sp" />
 
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="내용"
-            android:textSize="30sp" />
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="내용"
+                android:textSize="30sp" />
 
-        <ImageView
-            android:id="@+id/img_detail_1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:srcCompat="@tools:sample/avatars" />
+            <ImageView
+                android:id="@+id/imageDetail_1"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_gravity="center"
+                android:visibility="visible"
+                tools:srcCompat="@tools:sample/avatars" />
 
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/imageDetail_2"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_gravity="center"
+                android:visibility="visible"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <ImageView
+                android:id="@+id/imageDetail_3"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_gravity="center"
+                android:visibility="visible"
+                tools:srcCompat="@tools:sample/avatars" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

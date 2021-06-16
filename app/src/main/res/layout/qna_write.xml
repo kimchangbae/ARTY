@@ -10,6 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <TextView
@@ -17,6 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="카테고리"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
@@ -24,7 +26,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp" />
+            android:layout_marginLeft="10dp"
+            android:textSize="20sp" />
 
     </LinearLayout>
 
@@ -34,23 +37,11 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textView3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="제목" />
-
-        <EditText
-            android:id="@+id/edit_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName" />
-
-        <TextView
             android:id="@+id/textView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="내용" />
+            android:text="내용"
+            android:textSize="22sp" />
 
         <EditText
             android:id="@+id/edit_content"
@@ -62,12 +53,6 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="사진등록" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -78,7 +63,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="takingPicture"
             android:text="사진촬영" />
 
         <Button
@@ -86,8 +70,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="choosePicture"
             android:text="사진 불러오기" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="업로드 사진제한" />
+
+        <TextView
+            android:id="@+id/tv_upload_maximum"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -101,6 +101,8 @@
             android:id="@+id/insertImage1"
             android:layout_width="130dp"
             android:layout_height="130dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:onClick="deleteImage1"
             tools:srcCompat="@tools:sample/avatars" />
@@ -109,6 +111,8 @@
             android:id="@+id/insertImage2"
             android:layout_width="130dp"
             android:layout_height="130dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:onClick="deleteImage2"
             tools:srcCompat="@tools:sample/avatars" />
@@ -117,6 +121,8 @@
             android:id="@+id/insertImage3"
             android:layout_width="130dp"
             android:layout_height="130dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:onClick="deleteImage3"
             tools:srcCompat="@tools:sample/avatars" />
@@ -135,6 +141,7 @@
             android:id="@+id/btn_write_qna"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onClickWriteQna"
             android:text="등록하기" />
 
     </LinearLayout>

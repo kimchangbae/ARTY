@@ -28,20 +28,20 @@
         android:ems="10"
         android:hint="패스워드"
         android:inputType="textPassword"
-        android:text="admin1" />
+        android:text="111111" />
 
     <Button
         android:id="@+id/btn_login"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:onClick="btn_login"
+        android:onClick="firebaseLogin"
         android:text="로그인" />
 
     <ImageView
         android:id="@+id/img_kakao_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="btn_kakao_login"
+        android:onClick="kakaoLogin"
         app:srcCompat="@drawable/kakao_login_large_wide" />
 
     <LinearLayout
@@ -53,7 +53,7 @@
         <Button
             android:id="@+id/button3"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:layout_weight="1"
             android:onClick="userJoin"
             android:text="회원가입" />
@@ -61,7 +61,7 @@
         <Button
             android:id="@+id/button4"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:layout_weight="1"
             android:onClick="findPassword"
             android:text="비밀번호찾기" />

@@ -7,13 +7,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.arty.Main.MainActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-public class QnaDelete extends AppCompatActivity {
+public class QnaDelete extends QnaCommon {
     static final String COLLECTION_NAME = "QNA_BOARD";
 
     private FirebaseFirestore   db;
@@ -75,7 +76,7 @@ public class QnaDelete extends AppCompatActivity {
     }
 
     public void goToHome() {
-        Intent intent = new Intent(this, QnaMain.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
