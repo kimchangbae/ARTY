@@ -1,4 +1,4 @@
-package com.arty.Qna;
+package com.arty.FreeBoard;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,38 +14,33 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.Serializable;
 
-public class QnaDetail extends QnaCommon implements Serializable {
-    static final String TAG = "QnaDetail";
+public class FreeBoardDetail extends FreeBoardCommon implements Serializable {
+    static final String TAG = "FreeBoardDetail";
 
-    private TextView    contentType, content, uploadDate;
+    private TextView    userId, content, uploadTime;
     private ImageView   image1, image2, image3;
     private Button      btn_update, btn_delete;
 
     private String              uuId;
-    private Qna                 qna;
+    private FreeBoard           board;
     private boolean[]           haveImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG,"QnaDetail--ON CREATE");
-        setContentView(R.layout.qna_detail);
+        Log.d(TAG,"FreeBoardDetail--ON CREATE");
+        setContentView(R.layout.freeboard_detail);
 
-        mDB     = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance();
-        mAuth   = FirebaseAuth.getInstance();
 
-        contentType     = findViewById(R.id.tv_fb_dt_userId);
+        userId          = findViewById(R.id.tv_fb_dt_userId);
         content         = findViewById(R.id.tv_fb_dt_content);
-        uploadDate      = findViewById(R.id.tv_fb_dt_uploadTime);
+        uploadTime      = findViewById(R.id.tv_fb_dt_uploadTime);
+
         image1          = findViewById(R.id.imageDetail_1);
         image2          = findViewById(R.id.imageDetail_2);
         image3          = findViewById(R.id.imageDetail_3);
@@ -61,27 +56,20 @@ public class QnaDetail extends QnaCommon implements Serializable {
 
     @Override
     protected void onStart() {
-        Log.d(TAG,"QnaDetail--ON START");
+        Log.d(TAG,"FreeBoardDetail--ON START");
         super.onStart();
 
         Intent intent = getIntent();
         if(intent.getStringExtra("uuId") != null) {
             uuId = intent.getStringExtra("uuId");
             Log.d(TAG,"조회할 문서 ID [" + uuId + "]");
-            getQnaDataFromDB(uuId);
+            getFreeBoardData(uuId);
         } else {
             Log.d(TAG,"조회할 문서 ID가 존재하지 않습니다.");
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG,"QnaDetail--ON RESUME");
-        // TODO QnaInsert 또는 Update 실행 시 완료 되는 시점에 Detail 데이터 재호출이 필요
-    }
-
-    private void getQnaDataFromDB(String uuId) {
+    private void getFreeBoardData(String uuId) {
         mDB
         .collection(COLLECTION_NAME)
         .document(uuId)
@@ -89,33 +77,34 @@ public class QnaDetail extends QnaCommon implements Serializable {
         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(Task<DocumentSnapshot> task) {
-                qna = task.getResult().toObject(Qna.class);
-                drawingIntentData(qna);
+                board = task.getResult().toObject(FreeBoard.class);
+                board.setUploadTime(timeComponent.switchTime(board.getUploadTime()));
+                drawingIntentData(board);
             }
         }).addOnFailureListener(e -> Log.d(TAG,"데이터 조회 실패 ... " + e.getMessage()));
     }
 
-    private void drawingIntentData(Qna qna) {
-        content.setText(qna.getContent());
-        contentType.setText(qna.getContentType());
-        uploadDate.setText(qna.getUploadTime());
+    private void drawingIntentData(FreeBoard board) {
+        content.setText(board.getContent());
+        userId.setText(board.getUserId());
+        uploadTime.setText(board.getUploadTime());
 
-        if(qna.getImage1() != null) {
+        if(board.getImage1() != null) {
             haveImage[0]=true;
             image1.setVisibility(View.VISIBLE);
-            Glide.with(this).load(qna.getImage1()).into(image1);
+            Glide.with(this).load(board.getImage1()).into(image1);
         }
 
-        if(qna.getImage2() != null) {
+        if(board.getImage2() != null) {
             image2.setVisibility(View.VISIBLE);
             haveImage[1]=true;
-            Glide.with(this).load(qna.getImage2()).into(image2);
+            Glide.with(this).load(board.getImage2()).into(image2);
         }
 
-        if(qna.getImage3() != null) {
+        if(board.getImage3() != null) {
             image3.setVisibility(View.VISIBLE);
             haveImage[2]=true;
-            Glide.with(this).load(qna.getImage3()).into(image3);
+            Glide.with(this).load(board.getImage3()).into(image3);
         }
     }
 
@@ -124,10 +113,10 @@ public class QnaDetail extends QnaCommon implements Serializable {
         finish();
     }
 
-    public void updateQna(View view) {
-        if(presentUserId.equals(qna.getUserId())) {
-            Intent intent = new Intent(QnaDetail.this, QnaUpdate.class);
-            intent.putExtra("qna",qna);
+    public void update(View view) {
+        if(presentUserId.equals(board.getUserId())) {
+            Intent intent = new Intent(FreeBoardDetail.this, FreeBoardUpdate.class);
+            intent.putExtra("board",board);
             startActivity(intent);
             finish();
         } else {
@@ -136,12 +125,12 @@ public class QnaDetail extends QnaCommon implements Serializable {
         }
     }
 
-    public void deleteQna(View view) {
-        if(presentUserId.equals(qna.getUserId())) {
-            deleteDocument(qna.getUuId());
+    public void delete(View view) {
+        if(presentUserId.equals(board.getUserId())) {
+            deleteDocument(board.getUuId());
             for(int i = 0; i<haveImage.length;i++) {
                 if(haveImage[i]) {
-                    deleteImage(qna.getFilePath(),i);
+                    deleteImage(board.getFilePath(),i);
                 }
             }
             goToMainActivity();

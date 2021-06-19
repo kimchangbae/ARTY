@@ -1,4 +1,4 @@
-package com.arty.Qna;
+package com.arty.FreeBoard;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -15,8 +15,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.arty.Common.ImageComponent;
+import com.arty.Common.TimeComponent;
 import com.arty.Main.MainActivity;
+import com.arty.Qna.QnaDetail;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -37,12 +38,11 @@ import java.util.Date;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 
-public class QnaCommon extends AppCompatActivity {
-    static final    String      TAG                     = "QnaCommon";
-    protected       String      timeStamp               = new SimpleDateFormat("yyyy/MM/dd_HH:mm:ss").format(new Date());
+public class FreeBoardCommon extends AppCompatActivity {
+    static final    String      TAG                     = "FreeBoardCommon";
     static final    int         UPLOAD_MAXIMUM_SIZE     = 3;   // 최대 이미지 등록 갯수
-    static final    String      COLLECTION_NAME         = "QNA_BOARD";
-    static final    String      IMAGE_FILE_PRE_PATH     = "QNA_BOARD_IMG/";
+    static final    String      COLLECTION_NAME         = "FREE_BOARD";
+    static final    String      IMAGE_FILE_PRE_PATH     = "FREE_BOARD_IMG/";
 
     private         Uri         photoURI;
     public          String      imgaeFilePath;
@@ -55,22 +55,20 @@ public class QnaCommon extends AppCompatActivity {
 
     protected       String      presentUserId;
     public          int         imageCount;
-    ImageComponent imageComponent;
-    public QnaCommon() {
-        Log.d(TAG,"QNA 생성자");
+    public TimeComponent        timeComponent;
+
+    public FreeBoardCommon() {
+        Log.d(TAG,"FreeBoard 생성자");
 
         storage     = FirebaseStorage.getInstance();
         mAuth       = FirebaseAuth.getInstance();
         mKakao      = UserApiClient.getInstance();
         mDB         = FirebaseFirestore.getInstance();
-
-        imageComponent = new ImageComponent();
-
+        timeComponent = new TimeComponent();
         searchUserId();
     }
 
     public void searchUserId() {
-        Log.d(TAG,"QNA.searchUserId");
         if(mAuth.getCurrentUser() != null) {
             Log.d(TAG,"mAuth ID ---> " + mAuth.getCurrentUser().getEmail());
             getUserId(mAuth.getCurrentUser().getEmail());
@@ -141,28 +139,26 @@ public class QnaCommon extends AppCompatActivity {
     }
 
     
-    // 사진 촬영
+    // 사진 촬영 버튼 클릭 이벤트
     public Uri takingPicture() {
-        Uri photoURI = null;
-        File photoFile = null;
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         if(intent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
             try {
                 photoFile = createImageFile();
-
             }catch (IOException e) {
                 e.printStackTrace();
             }
 
             if(photoFile != null) {
-                imgaeFilePath = photoFile.getAbsolutePath();
                 photoURI = FileProvider.getUriForFile(getApplicationContext(),"com.arty.Qna.fileprovider",photoFile);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(intent,101);
+                return photoURI;
             }
         }
-        return photoURI;
+        return null;
     }
 
     private File createImageFile() throws IOException {
@@ -170,11 +166,11 @@ public class QnaCommon extends AppCompatActivity {
         //String imageFileName    = "JPEG_" + timeStamp + "_";
         String imageFileName    = timeStamp + "_";
         File storageDir         = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-
         File image              = File.createTempFile(imageFileName,".jpg",storageDir);
 
+        imgaeFilePath           = image.getAbsolutePath();
         return image;
-    }
+    };
 
     // 사진 가져오기 버튼 클릭 이벤트
     public void choosePicture() {
@@ -260,7 +256,7 @@ public class QnaCommon extends AppCompatActivity {
     }
 
     protected void goToDetailActivity(String uuId) {
-        Intent intent = new Intent(this, QnaDetail.class);
+        Intent intent = new Intent(this, FreeBoardDetail.class);
         intent.putExtra("uuId", uuId);
         startActivity(intent);
         finish();

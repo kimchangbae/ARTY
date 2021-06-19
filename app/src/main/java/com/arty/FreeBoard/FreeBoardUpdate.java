@@ -1,4 +1,4 @@
-package com.arty.Qna;
+package com.arty.FreeBoard;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -15,28 +15,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
-import com.arty.Main.MainActivity;
 import com.arty.R;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class QnaUpdate extends QnaCommon {
-    static final String     TAG = "QnaUpdate";
+public class FreeBoardUpdate extends FreeBoardCommon {
+    static final String     TAG = "FreeBoardUpdate";
 
     private TextView        contentType, content, update_maximum;
     private ImageView       image1, image2, image3;
@@ -53,11 +46,11 @@ public class QnaUpdate extends QnaCommon {
 
     private int  writeStart, writeFinish;
 
-    private Qna qna;
+    private FreeBoard board;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.qna_update);
+        setContentView(R.layout.freeboard_update);
 
         contentType     = findViewById(R.id.edit_contentType);
         content         = findViewById(R.id.in_content);
@@ -77,38 +70,34 @@ public class QnaUpdate extends QnaCommon {
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setMessage("수정중");
 
-        qna             = getIntent().getParcelableExtra("qna");
-        documentPath    = qna.getUuId();        // Firestore 문서 경로
-        filePath        = qna.getFilePath();    // storage 경로
+        board           = getIntent().getParcelableExtra("board");
+        documentPath    = board.getUuId();        // Firestore 문서 경로
+        filePath        = board.getFilePath();    // storage 경로
 
         imageCount = 0;
         update_maximum.setText(imageCount + " / " + UPLOAD_MAXIMUM_SIZE);
 
-        Log.d(TAG,"호출된 시간 : " + timeStamp);
-        Log.d(TAG,qna.toString());
-
         // 기본 정보
-        contentType.setText(qna.getContentType());
-        content.setText(qna.getContent());
+        content.setText(board.getContent());
 
-        if(qna.getImage1() != null) {
-            beforeUris[0] = Uri.parse(qna.getImage1());
-            uris[0] = Uri.parse(qna.getImage1());
-            Glide.with(this).load(qna.getImage1()).into(image1);
+        if(board.getImage1() != null) {
+            beforeUris[0] = Uri.parse(board.getImage1());
+            uris[0] = Uri.parse(board.getImage1());
+            Glide.with(this).load(board.getImage1()).into(image1);
             changeImgUpCount(update_maximum,"up");
         }
 
-        if(qna.getImage2() != null) {
-            uris[1] = Uri.parse(qna.getImage2());
-            beforeUris[1] = Uri.parse(qna.getImage2());
-            Glide.with(this).load(qna.getImage2()).into(image2);
+        if(board.getImage2() != null) {
+            uris[1] = Uri.parse(board.getImage2());
+            beforeUris[1] = Uri.parse(board.getImage2());
+            Glide.with(this).load(board.getImage2()).into(image2);
             changeImgUpCount(update_maximum,"up");
         }
 
-        if(qna.getImage3() != null) {
-            uris[2] = Uri.parse(qna.getImage3());
-            beforeUris[2] = Uri.parse(qna.getImage3());
-            Glide.with(this).load(qna.getImage3()).into(image3);
+        if(board.getImage3() != null) {
+            uris[2] = Uri.parse(board.getImage3());
+            beforeUris[2] = Uri.parse(board.getImage3());
+            Glide.with(this).load(board.getImage3()).into(image3);
             changeImgUpCount(update_maximum,"up");
         }
     }
@@ -157,7 +146,7 @@ public class QnaUpdate extends QnaCommon {
     // 업데이트
     public void onClickUpdateQna(View view) {
         if(isImageEmpty(image1,image2,image3)) {
-            Toast.makeText(QnaUpdate.this,"사진은 반드시 1개 이상 등록해야 합니다.",Toast.LENGTH_SHORT).show();
+            Toast.makeText(FreeBoardUpdate.this,"사진은 반드시 1개 이상 등록해야 합니다.",Toast.LENGTH_SHORT).show();
             return;
         } else {
             progressDialog.show();
@@ -182,7 +171,7 @@ public class QnaUpdate extends QnaCommon {
                 }
                 if(writeFinish == 0) {
                     progressDialog.dismiss();
-                    goToDetailActivity(qna.getUuId());
+                    goToDetailActivity(board.getUuId());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -249,7 +238,7 @@ public class QnaUpdate extends QnaCommon {
             Log.d(TAG,"업데이트 진행률 [" + writeStart  + "/" + writeFinish + "]");
             if(writeStart == writeFinish) {
                 progressDialog.dismiss();
-                goToDetailActivity(qna.getUuId());
+                goToDetailActivity(board.getUuId());
             }
             return null;
         }
@@ -260,21 +249,18 @@ public class QnaUpdate extends QnaCommon {
             Map<String, Object> map = new HashMap<>();
             String content = this.content.getText().toString();
 
-            // this.qna.setContent(content);
-            // this.qna.setUploadTime();
-
             map.put("content", content);
             map.put("uploadTime",String.valueOf(System.currentTimeMillis()));
 
             mDB
             .collection(COLLECTION_NAME)
-            .document(this.qna.getUuId())
+            .document(this.board.getUuId())
             .update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(Task<Void> task) {
                     if(writeFinish == 0) {
                         progressDialog.dismiss();
-                        goToDetailActivity(qna.getUuId());
+                        goToDetailActivity(board.getUuId());
                     }
 
                 }

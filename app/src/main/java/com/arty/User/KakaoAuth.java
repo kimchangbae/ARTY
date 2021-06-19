@@ -1,7 +1,6 @@
 package com.arty.User;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -14,18 +13,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.arty.Main.MainActivity;
 import com.arty.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.kakao.sdk.user.UserApiClient;
 import com.kakao.sdk.user.model.User;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -33,14 +27,10 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
 
-public class KakaoJoin extends AppCompatActivity {
-    private static String TAG = "KakaoJoin";
-    static String CollectionPath = "USER_ACCOUNT";
+public class KakaoAuth extends CommonAuth {
+    private static String TAG = "KakaoAuth";
     final String randomKey = UUID.randomUUID().toString();
 
-
-    private FirebaseFirestore   mDB;
-    private FirebaseAuth        mAuth;
     private UserApiClient       userApiClient;
 
     UserAccount                 userAccount;
@@ -53,7 +43,6 @@ public class KakaoJoin extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_kakao_join);
 
-        mDB = FirebaseFirestore.getInstance();
         userApiClient = UserApiClient.getInstance();
 
         userId = findViewById(R.id.edit_kakao_userId);
@@ -83,7 +72,7 @@ public class KakaoJoin extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (validationUserId(view)) {
-                    userApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
+                    mKakao.me(new Function2<User, Throwable, Unit>() {
                         @Override
                         public Unit invoke(User user, Throwable throwable) {
                             userAccount = new UserAccount();
@@ -109,7 +98,7 @@ public class KakaoJoin extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        Log.d("KakaoJoin","[KakaoJoin.onPause]");
+        Log.d("KakaoAuth","[KakaoAuth.onPause]");
 
         // firebaseFirestore.terminate();
 
@@ -119,9 +108,9 @@ public class KakaoJoin extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Log.d(TAG,"카카오 조인에서 뒤로가기");
+        Log.d(TAG,"카카오톡 계정 생성중 뒤로가기 클릭");
 
-        userApiClient.unlink(new Function1<Throwable, Unit>() {
+        mKakao.unlink(new Function1<Throwable, Unit>() {
             @Override
             public Unit invoke(Throwable throwable) {
                 Log.d("AuthApplication", "logoutFunction");
@@ -142,14 +131,14 @@ public class KakaoJoin extends AppCompatActivity {
     }
 
     private void signUpForKakao(UserAccount userAccount) {
-        mDB.collection(CollectionPath)
+        mDB.collection(COLLECTION_PATH)
             .document(userAccount.getUuId())
             .set(userAccount)
             .addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
-                public void onComplete(@NonNull Task<Void> task) {
+                public void onComplete(Task<Void> task) {
                     if(task.isSuccessful()) {
-                        goToActivity("main");
+                        goToMainActivity();
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() {
@@ -169,37 +158,25 @@ public class KakaoJoin extends AppCompatActivity {
             alertUserId.setText("닉네임을 입력하세요.");
             alertUserId.setTextColor(Color.RED);
         } else {
-            mDB.collection(CollectionPath)
-                    .whereEqualTo("userId",strUserId)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            Log.d(TAG,"validationUserId");
-                            if(task.getResult().getDocuments().isEmpty()) {
-                                isUserIdOk = true;
-                                alertUserId.setText("사용가능 합니다.");
-                                alertUserId.setTextColor(Color.YELLOW);
-                            } else {
-                                isUserIdOk = false;
-                                alertUserId.setText("사용할 수 없는 닉네임 입니다.");
-                                alertUserId.setTextColor(Color.RED);
-                            }
+            mDB.collection(COLLECTION_PATH)
+                .whereEqualTo("userId",strUserId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        Log.d(TAG,"validationUserId");
+                        if(task.getResult().getDocuments().isEmpty()) {
+                            isUserIdOk = true;
+                            alertUserId.setText("사용가능 합니다.");
+                            alertUserId.setTextColor(Color.YELLOW);
+                        } else {
+                            isUserIdOk = false;
+                            alertUserId.setText("사용할 수 없는 닉네임 입니다.");
+                            alertUserId.setTextColor(Color.RED);
                         }
-                    });
+                    }
+                });
         }
         return isUserIdOk;
-    }
-
-    private void goToActivity(String path) {
-        Intent intent = null;
-
-        if(path != null && path.equals("login")) {
-            intent = new Intent(KakaoJoin.this, Login.class);
-        } else if (path != null && path.equals("main")){
-            intent = new Intent(KakaoJoin.this, MainActivity.class);
-        }
-        startActivity(intent);
-        finish();
     }
 }

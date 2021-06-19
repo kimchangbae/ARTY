@@ -1,10 +1,5 @@
 package com.arty.User;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatCheckBox;
-
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -16,27 +11,28 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatCheckBox;
+
 import com.arty.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.regex.Pattern;
 
-public class UserJoin extends AppCompatActivity {
-    final static String TAG = "UserJoin";
+public class FirebaseAuth extends CommonAuth {
+    final static String TAG = "FirebaseAuth";
     String pswdPattern = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&]).{8,15}.$";
     String pswdPattern2 = "((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9가-힣]).{8,16})";
 
     TextView userId, email, pswd;
-    private FirebaseAuth mAuth;
+    private com.google.firebase.auth.FirebaseAuth mAuth;
     private FirebaseFirestore mDB;
-    final String CollectionPath = "USER_ACCOUNT";
 
     boolean isEmailOk, isUserIdOk, isPswdOk = false;
 
@@ -55,14 +51,14 @@ public class UserJoin extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_join);
 
-        mAuth   = FirebaseAuth.getInstance();
-        mDB     = FirebaseFirestore.getInstance();
-
         email       = findViewById(R.id.edit_lgn_email);
         userId      = findViewById(R.id.edit_userId);
         pswd        = findViewById(R.id.edit_pswd);
+    }
 
-
+    @Override
+    protected void onStart() {
+        super.onStart();
 
         Button btn_signUp = findViewById(R.id.btn_signUp);
         btn_signUp.setOnClickListener(new View.OnClickListener() {
@@ -75,11 +71,6 @@ public class UserJoin extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         email.addTextChangedListener(new TextWatcher() {
             @Override
@@ -110,7 +101,6 @@ public class UserJoin extends AppCompatActivity {
                 }
             }
         });
-
 
         pswd.addTextChangedListener(new TextWatcher() {
             @Override
@@ -152,7 +142,7 @@ public class UserJoin extends AppCompatActivity {
             }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(Exception e) {
-                Log.d("UserJoin", "Authentication 사용자 등록 실패" + e.getMessage());
+                Log.d("FirebaseAuth", "Authentication 사용자 등록 실패" + e.getMessage());
             }
         });
     }
@@ -163,7 +153,7 @@ public class UserJoin extends AppCompatActivity {
         user.setUserId(userId.getText().toString());
         user.setEmail(email.getText().toString());
 
-        mDB.collection(CollectionPath)
+        mDB.collection(COLLECTION_PATH)
             .document(uuId)
             .set(user)
             .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -189,7 +179,7 @@ public class UserJoin extends AppCompatActivity {
 
         Pattern pattern = Patterns.EMAIL_ADDRESS;
         if(pattern.matcher(strEmail).matches()) {
-            mDB.collection(CollectionPath)
+            mDB.collection(COLLECTION_PATH)
                 .whereEqualTo("email",strEmail)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -223,7 +213,7 @@ public class UserJoin extends AppCompatActivity {
             alertUserId.setText("닉네임을 입력하세요.");
             alertUserId.setTextColor(Color.RED);
         } else{
-            mDB.collection(CollectionPath)
+            mDB.collection(COLLECTION_PATH)
                 .whereEqualTo("userId",strUserId)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -244,11 +234,4 @@ public class UserJoin extends AppCompatActivity {
         }
         return isUserIdOk;
     }
-
-    private void goToLoginActivity() {
-        Intent intent = new Intent(UserJoin.this, Login.class);
-        startActivity(intent);
-        finish();
-    }
-
 }

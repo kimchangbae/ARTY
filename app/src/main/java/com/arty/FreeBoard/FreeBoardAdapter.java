@@ -45,6 +45,10 @@ public class FreeBoardAdapter extends RecyclerView.Adapter<FreeBoardAdapter.View
         freeBoardList.set(position, item);
     }
 
+    public String getUuid(int position) {
+        return freeBoardList.get(position).getUuId();
+    }
+
     public void setClickListener(FreeBoardClickListener listener) {
         this.listener = listener;
     }
@@ -61,7 +65,7 @@ public class FreeBoardAdapter extends RecyclerView.Adapter<FreeBoardAdapter.View
     public void onBindViewHolder(FreeBoardAdapter.ViewHolder holder, int position) {
         holder.content.setText(freeBoardList.get(position).getContent());
         holder.userId.setText(freeBoardList.get(position).getUserId());
-        holder.uploadDate.setText(freeBoardList.get(position).getUploadDate());
+        holder.uploadDate.setText(freeBoardList.get(position).getUploadTime());
         Glide.with(holder.itemView).load(freeBoardList.get(position).getImage1()).into(holder.imageView);
 
         //FreeBoard item = qnaLists.get(position);

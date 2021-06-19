@@ -2,9 +2,6 @@ package com.arty.User;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,11 +9,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+
+import com.arty.Main.MainActivity;
 import com.arty.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.kakao.sdk.auth.AuthApiClient;
 import com.kakao.sdk.user.UserApiClient;
 import com.kakao.sdk.user.model.User;
 
@@ -30,9 +31,11 @@ public class MyPageFragment extends Fragment {
 
     private FirebaseAuth        mAuth;
     private UserApiClient       mKakao;
+    private AuthApiClient       mKakaoAuth;
     private FirebaseFirestore   mDB;
 
     Button btn_logout, btn_withdraw, btn_add;
+    private String userId;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +44,7 @@ public class MyPageFragment extends Fragment {
 
         mAuth       = FirebaseAuth.getInstance();
         mKakao      = UserApiClient.getInstance();
+        mKakaoAuth  = AuthApiClient.getInstance();
         mDB         = FirebaseFirestore.getInstance();
     }
 
@@ -48,6 +52,7 @@ public class MyPageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG,"ON ON CREATE VIEW --> MyPageFragment");
+        ((MainActivity)getActivity()).navigation = "mypage";
         ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.fragment_mypage, container, false);
 
         btn_logout      = viewGroup.findViewById(R.id.btn_logout);
@@ -56,9 +61,10 @@ public class MyPageFragment extends Fragment {
         btn_add = getActivity().findViewById(R.id.btn_add);
         btn_add.setVisibility(View.INVISIBLE);
 
-        String getUserId = mAuth.getTenantId();
+        userId = ((MainActivity)getActivity()).userId;
+
         TextView tv_show_id = viewGroup.findViewById(R.id.tv_show_id);
-        tv_show_id.setText(getUserId + " 님");
+        tv_show_id.setText(userId + " 님");
 
         return viewGroup;
     }
@@ -81,7 +87,6 @@ public class MyPageFragment extends Fragment {
                 } else {
                     kakaoTalkLogout();
                 }
-                mDB.terminate();
                 goToLogin();
             }
         });
@@ -110,7 +115,7 @@ public class MyPageFragment extends Fragment {
     private void firebaseLogout() {
         mAuth.getInstance().signOut();
         Log.d(TAG,"----------------------------------------------------");
-        Log.d(TAG, "파이어베이스 로그아웃");
+        Log.d(TAG, "파이어베이스 로그아웃 테넨트ID [" + mAuth.getTenantId() +"]");
         Log.d(TAG,"----------------------------------------------------");
     }
 
@@ -163,6 +168,22 @@ public class MyPageFragment extends Fragment {
         });
     }
 
+    // 카카오톡 회원탈퇴
+    public void kakaoTalkWithdraw(){
+        UserApiClient.getInstance().me(function2);
+        mKakao.unlink(throwable -> {
+            Log.d(TAG, "카카오톡 회원탈퇴");
+
+            if(throwable != null) {
+                Log.d(TAG,"----------------------------------------------------");
+                Log.d("AuthApplication", "카카오톡 회원탈퇴 에러 발생" + throwable.getMessage());
+                Log.d(TAG,"----------------------------------------------------");
+            }
+
+            return null;
+        });
+    }
+
     Function2<User, Throwable, Unit> function2 = new Function2<User, Throwable, Unit>() {
         @Override
         public Unit invoke(User user, Throwable throwable) {
@@ -186,20 +207,4 @@ public class MyPageFragment extends Fragment {
             return null;
         }
     };
-
-    // 카카오톡 회원탈퇴
-    public void kakaoTalkWithdraw(){
-        UserApiClient.getInstance().me(function2);
-        mKakao.unlink(throwable -> {
-            Log.d(TAG, "카카오톡 회원탈퇴");
-
-            if(throwable != null) {
-                Log.d(TAG,"----------------------------------------------------");
-                Log.d("AuthApplication", "카카오톡 회원탈퇴 에러 발생" + throwable.getMessage());
-                Log.d(TAG,"----------------------------------------------------");
-            }
-
-            return null;
-        });
-    }
 }

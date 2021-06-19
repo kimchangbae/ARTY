@@ -1,18 +1,18 @@
 package com.arty.Navigation;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.arty.FreeBoard.FreeBoardFragment;
+import com.arty.Main.MainActivity;
 import com.arty.Main.MainFragment;
 import com.arty.Qna.QnaFragment;
 import com.arty.R;
@@ -29,7 +29,7 @@ public class NavigationBottom extends Fragment {
     FreeBoardFragment   freeBoardFragment;
     MyPageFragment      myPageFragment;
 
-    FragmentManager fragmentManager;
+    FragmentManager     fragmentManager;
     FragmentTransaction transaction;
 
     @Override
@@ -51,7 +51,19 @@ public class NavigationBottom extends Fragment {
         fragmentManager = getActivity().getSupportFragmentManager();
         transaction     = fragmentManager.beginTransaction();
 
-        transaction.replace(R.id.frame, mainFragment).commit();
+        String navigation = ((MainActivity)getActivity()).navigation;
+        if(navigation.equals("main"))   transaction.replace(R.id.frame, mainFragment).commit();
+        if(navigation.equals("ai"))     transaction.replace(R.id.frame, qnaMainFragment).commit();
+        if(navigation.equals("free"))   transaction.replace(R.id.frame, freeBoardFragment).commit();
+        //if(navigaton.equals("market")) transaction.replace(R.id.frame, mainFragment).commit();
+        if(navigation.equals("mypage")) transaction.replace(R.id.frame, myPageFragment).commit();
+
+        return viewGroup;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         mainPage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,7 +76,7 @@ public class NavigationBottom extends Fragment {
         aiPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG,"OnClickListener----> AI진단 리스트 호출");
+                Log.d(TAG,"OnClickListener----> AI진단 호출");
                 transaction     = fragmentManager.beginTransaction();
                 transaction.replace(R.id.frame, qnaMainFragment).commit();
             }
@@ -73,7 +85,7 @@ public class NavigationBottom extends Fragment {
         freePage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG,"OnClickListener----> 자유게시판 리스트 호출");
+                Log.d(TAG,"OnClickListener----> 자유게시판 호출");
                 transaction     = fragmentManager.beginTransaction();
                 transaction.replace(R.id.frame, freeBoardFragment).commit();
             }
@@ -82,11 +94,10 @@ public class NavigationBottom extends Fragment {
         myPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG,"OnClickListener----> 마이페이지 호출");
                 transaction     = fragmentManager.beginTransaction();
                 transaction.replace(R.id.frame, myPageFragment).commit();
             }
         });
-
-        return viewGroup;
     }
 }

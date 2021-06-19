@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Qna.QnaDetail">
+    tools:context=".FreeBoard.FreeBoardDetail">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,24 +13,24 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btn_udt_cancel"
+            android:id="@+id/btn_udt_f_cancel"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:onClick="backToHome"
             android:text="X" />
 
         <Button
-            android:id="@+id/btn_update"
+            android:id="@+id/btn_f_update"
             android:layout_width="70dp"
             android:layout_height="wrap_content"
-            android:onClick="updateQna"
+            android:onClick="update"
             android:text="수정" />
 
         <Button
-            android:id="@+id/btn_delete"
+            android:id="@+id/btn_f_delete"
             android:layout_width="70dp"
             android:layout_height="wrap_content"
-            android:onClick="deleteQna"
+            android:onClick="delete"
             android:text="삭제" />
     </LinearLayout>
 

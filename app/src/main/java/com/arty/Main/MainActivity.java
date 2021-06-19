@@ -1,12 +1,5 @@
 package com.arty.Main;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
-import android.content.ClipData;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -14,13 +7,33 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.arty.Common.TimeComponent;
 import com.arty.Navigation.NavigationBottom;
 import com.arty.Navigation.ToolBar;
 import com.arty.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.kakao.sdk.auth.AuthApiClient;
+import com.kakao.sdk.user.UserApiClient;
+import com.kakao.sdk.user.model.User;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function2;
 
 public class MainActivity extends AppCompatActivity {
     static final String TAG         = "MainActivity";
+
     private long clickTime = 0;
+    final static String COLLECTION_PATH = "USER_ACCOUNT";
 
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
@@ -28,24 +41,41 @@ public class MainActivity extends AppCompatActivity {
     ToolBar             toolBar;
     NavigationBottom    bottomNavigation;
 
+    protected FirebaseFirestore     mDB;
+    protected   FirebaseAuth        mAuth;
+    protected UserApiClient         mKakao;
+    private AuthApiClient           mKakaoAuth;
+
+    public static String userId;
+    public static String navigation;
+
+    public TimeComponent timeComponent;
+
+    public MainActivity() {
+        navigation = "main";
+        userId = null;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fragmentManager = getSupportFragmentManager();
-        transaction     = fragmentManager.beginTransaction();
+        timeComponent = new TimeComponent();
 
-        toolBar = (ToolBar)  fragmentManager.findFragmentById(R.id.toolBar);
-        bottomNavigation = (NavigationBottom) fragmentManager.findFragmentById(R.id.navigation);
-    }
+        mAuth       = FirebaseAuth.getInstance();
+        mKakao      = UserApiClient.getInstance();
+        mKakaoAuth  = AuthApiClient.getInstance();
+        mDB         = FirebaseFirestore.getInstance();
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG,"결과값 --->" + requestCode);
-        Log.d(TAG,"결과값 --->" + resultCode);
-        Log.d(TAG,"결과값 --->" + data.getData());
+        fragmentManager     = getSupportFragmentManager();
+        transaction         = fragmentManager.beginTransaction();
+
+        toolBar             = (ToolBar)  fragmentManager.findFragmentById(R.id.toolBar);
+        bottomNavigation    = (NavigationBottom) fragmentManager.findFragmentById(R.id.navigation);
+
+        Log.d(TAG,"접속해서 유저아이디 조회하기");
+        searchUserId();
     }
 
     @Override
@@ -70,6 +100,65 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"---------------------------");
         Log.d(TAG,"MAIN ACTIVITY DISTROY");
         Log.d(TAG,"---------------------------");
+    }
+
+    public void searchUserId() {
+        Log.d(TAG,"MainActivity.searchUserId");
+        if(mAuth.getCurrentUser() != null) {
+            Log.d(TAG,"mAuth ID ---> " + mAuth.getCurrentUser().getEmail());
+            getUserId(mAuth.getCurrentUser().getEmail());
+        } else if(mKakaoAuth.hasToken()) {
+            mKakao.me(new Function2<User, Throwable, Unit>() {
+                @Override
+                public Unit invoke(User user, Throwable throwable) {
+                    if(user != null) {
+                        Log.d(TAG,"mKakao ID ---> " + user.getId());
+                        getUserId(user.getId());
+                    }
+                    return null;
+                }
+            });
+        }
+    }
+
+    public void getUserId(String email) {
+        mDB.collection(COLLECTION_PATH)
+            .whereEqualTo("email",email)
+            .get()
+            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(Task<QuerySnapshot> task) {
+                    if(task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            userId = (String) document.getData().get("userId");
+                            Log.d(TAG, "DB 에서 검색된 사용자 아이디(파이어베이스) : " + userId);
+                        }
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void getUserId(long kakaoId) {
+        mDB.collection(COLLECTION_PATH)
+        .whereEqualTo("kakaoId",kakaoId)
+        .get()
+        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        userId = (String) document.getData().get("userId");
+                        Log.d(TAG, "DB 에서 검색된 사용자 아이디(카카오) : " + userId);
+
+                    }
+                }
+            }
+        }).addOnFailureListener(e -> e.printStackTrace());
     }
 
     protected void killARTY() {

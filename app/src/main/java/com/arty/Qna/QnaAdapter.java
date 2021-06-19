@@ -70,7 +70,7 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
         Glide.with(holder.itemView).load(qnaList.get(position).getImage1()).into(holder.imageView);
 
 
-        holder.tv_uploadDate.setText(qnaList.get(position).getUploadDate());
+        holder.tv_uploadDate.setText(qnaList.get(position).getUploadTime());
 
         //FreeBoard item = qnaLists.get(position);
         //holder.setItem(item);

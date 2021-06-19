@@ -1,4 +1,4 @@
-package com.arty.Qna;
+package com.arty.FreeBoard;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -15,25 +15,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.arty.Main.MainActivity;
 import com.arty.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class QnaWrite extends QnaCommon {
-    static final String TAG = "QnaWrite";
+public class FreeBoardWrite extends FreeBoardCommon {
+    static final String TAG = "FreeBoardWrite";
 
     private StorageReference    storageReference;
 
@@ -44,14 +39,13 @@ public class QnaWrite extends QnaCommon {
     private ProgressDialog      progressDialog;
     private Uri[]               uris;
 
-    private int                 writeStart, writeFinish, imgCnt;
-    private Qna                 qna;
+    private int                 writeStart, writeFinish;
+    private FreeBoard board;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.qna_write);
-        inputType(); // QnaPopup 액티비티에서 식물이아파요 or 식물이 궁금해요 선택한 정보를 화면에 뿌려준다.
+        setContentView(R.layout.freeboard_write);
 
         contentType     = findViewById(R.id.edit_contentType);
         content         = findViewById(R.id.edit_content);
@@ -78,7 +72,7 @@ public class QnaWrite extends QnaCommon {
         findViewById(R.id.btn_take_photo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onClickTakePicture();
+               onClickTakePicture();
             }
         });
 
@@ -89,6 +83,52 @@ public class QnaWrite extends QnaCommon {
                 onClickGetPicture();
             }
         });
+    }
+
+    public void onClickTakePicture() {
+        if(imageCount >= UPLOAD_MAXIMUM_SIZE) {
+            Toast.makeText(getApplicationContext(),"업로드 제한 갯수를 초과하였습니다.",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        imgUri = takingPicture();
+    }
+
+    public void onClickGetPicture() {
+        if(imageCount >= UPLOAD_MAXIMUM_SIZE) {
+            Toast.makeText(getApplicationContext(),"업로드 제한 갯수를 초과하였습니다.",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        choosePicture();
+    }
+
+    public void onClickWriteQna(View view) {
+        if(isImageEmpty(image1,image2,image3)) {
+            Toast.makeText(FreeBoardWrite.this,"사진은 반드시 1장이상 등록해야 합니다.",Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            progressDialog.show();
+            progressDialog.setCancelable(false);
+
+            board = new FreeBoard();
+            writeStart = 0;
+            writeFinish=getUriCount(uris);
+            // distributeImage(); // uris 에 저장된 uri 값을 string 형태로 qna 객체에 저장.
+            progressDialog.setMessage("저장중");
+            String uuidKey = UUID.randomUUID().toString().substring(0,16);
+
+            writeFreeBoard(uuidKey);
+            try{
+                for (int i = 0; i < uris.length; i++) {
+                    if(uris[i] != null) {
+                        uploadImage(uuidKey, i);
+                    }
+                }
+            } catch(Exception e) {
+                progressDialog.dismiss();
+                goToMainActivity();
+                e.printStackTrace();
+            }
+        }
     }
 
     // 사진 촬영 완료 or 사진 가져오기 완료 후 이벤트
@@ -134,67 +174,19 @@ public class QnaWrite extends QnaCommon {
         }
     }
 
-    public void onClickTakePicture() {
-        if(imageCount >= UPLOAD_MAXIMUM_SIZE) {
-            Toast.makeText(getApplicationContext(),"업로드 제한 갯수를 초과하였습니다.",Toast.LENGTH_SHORT).show();
-            return;
-        }
-        imgUri = takingPicture();
-        Log.d(TAG,"onClickTakePicture.imgUri --> " + imgUri);
-    }
-
-    public void onClickGetPicture() {
-        if(imageCount >= UPLOAD_MAXIMUM_SIZE) {
-            Toast.makeText(getApplicationContext(),"업로드 제한 갯수를 초과하였습니다.",Toast.LENGTH_SHORT).show();
-            return;
-        }
-        choosePicture();
-    }
-
-    public void onClickWriteQna(View view) {
-        if(isImageEmpty(image1,image2,image3)) {
-            Toast.makeText(QnaWrite.this,"사진은 반드시 1장이상 등록해야 합니다.",Toast.LENGTH_SHORT).show();
-            return;
-        } else {
-            progressDialog.show();
-            progressDialog.setCancelable(false);
-            progressDialog.setMessage("저장중");
-
-            qna = new Qna();
-            writeStart = 0;
-            writeFinish=getUriCount(uris);
-
-            String uuidKey = UUID.randomUUID().toString().substring(0,16);
-
-            writeQna(uuidKey);
-            try{
-                for (int i = 0; i < uris.length; i++) {
-                    if(uris[i] != null) {
-                        uploadImage(uuidKey, i);
-                    }
-                }
-            } catch(Exception e) {
-                progressDialog.dismiss();
-                goToMainActivity();
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void writeQna(String uuId) {
+    public void writeFreeBoard(String uuId) {
         String filePath = IMAGE_FILE_PRE_PATH + uuId;
 
         try {
-            qna.setUuId(uuId);
-            qna.setContentType(contentType.getText().toString());
-            qna.setContent(content.getText().toString());
-            qna.setUserId(presentUserId);
-            qna.setUploadTime(String.valueOf(System.currentTimeMillis()));
-            qna.setFilePath(filePath);
+            board.setUuId(uuId);
+            board.setContent(content.getText().toString());
+            board.setUserId(presentUserId);
+            board.setUploadTime(String.valueOf(System.currentTimeMillis()));
+            board.setFilePath(filePath);
 
             mDB.collection(COLLECTION_NAME)
             .document(uuId)
-            .set(qna, SetOptions.merge())
+            .set(board, SetOptions.merge())
             .addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(Task<Void> task) {
@@ -301,18 +293,6 @@ public class QnaWrite extends QnaCommon {
             image3.setImageResource(0);
             changeImgUpCount(upload_maximum,"down");
             uris[2] = null;
-        }
-    }
-
-    public void inputType() {
-        contentType = findViewById(R.id.edit_contentType);
-        Intent intent = getIntent();
-        String data = intent.getStringExtra("type");
-
-        if(data.equals("1")) {
-            contentType.setText("식물이 아파요");
-        } else {
-            contentType.setText("식물이 궁금해요");
         }
     }
 }

@@ -13,28 +13,27 @@
         android:maxSdkVersion="19" />
 
     <application
-        android:name=".User.AuthApplication"
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
-        <!-- USER -->
+        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
+        android:name=".User.AuthApplication">
         <activity android:name=".Main.MainActivity" />
-        <activity android:name=".User.KakaoJoin" />
-        <activity android:name=".User.UserJoin" />
-        <!-- QNA -->
+        <activity android:name=".FreeBoard.FreeBoardDetail" />
+        <activity android:name=".FreeBoard.FreeBoardWrite" />
+        <activity android:name=".FreeBoard.FreeBoardUpdate" />
         <activity android:name=".Qna.QnaLoading" />
         <activity android:name=".Qna.QnaWrite" />
         <activity android:name=".Qna.QnaDetail" />
         <activity android:name=".Qna.QnaUpdate" />
-        <activity android:name=".Qna.QnaDelete" />
         <activity
             android:name=".Qna.QnaPopup"
             android:theme="@android:style/Theme.Dialog" />
-        <!-- Main Activity -->
+        <activity android:name=".User.KakaoAuth" />
+        <activity android:name=".User.FirebaseAuth" />
         <activity android:name=".User.Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

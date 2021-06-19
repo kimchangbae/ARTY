@@ -7,7 +7,7 @@ import android.os.Parcelable;
 public class FreeBoard implements Parcelable {
     private String  uuId;           // Document Key(PK);
     private String  userId;         // 글 작성자
-    private String  uploadDate;     // 작성일자
+    private String  uploadTime;     // 작성일자
     private String  content;        // 내용
     private String  image1;         // 첨부이미지1(다운로드URL)
     private String  image2;         // 첨부이미지2(다운로드URL)
@@ -18,7 +18,7 @@ public class FreeBoard implements Parcelable {
         this.uuId           = parcel.readString();
         this.userId         = parcel.readString();
         this.content        = parcel.readString();
-        this.uploadDate     = parcel.readString();
+        this.uploadTime     = parcel.readString();
         this.image1         = parcel.readString();
         this.image2         = parcel.readString();
         this.image3         = parcel.readString();
@@ -51,7 +51,7 @@ public class FreeBoard implements Parcelable {
         dest.writeString(this.uuId);
         dest.writeString(this.userId);
         dest.writeString(this.content);
-        dest.writeString(this.uploadDate);
+        dest.writeString(this.uploadTime);
         dest.writeString(this.image1);
         dest.writeString(this.image2);
         dest.writeString(this.image3);
@@ -63,7 +63,7 @@ public class FreeBoard implements Parcelable {
         return "FreeBoard{" +
                 "uuid='" + uuId + '\'' +
                 ", userId='" + userId + '\'' +
-                ", uploadDate=" + uploadDate +
+                ", uploadtime=" + uploadTime +
                 ", content='" + content + '\'' +
                 ", image1='" + image1 + '\'' +
                 ", image2='" + image2 + '\'' +
@@ -88,12 +88,12 @@ public class FreeBoard implements Parcelable {
         this.userId = userId;
     }
 
-    public String getUploadDate() {
-        return uploadDate;
+    public String getUploadTime() {
+        return uploadTime;
     }
 
-    public void setUploadDate(String uploadDate) {
-        this.uploadDate = uploadDate;
+    public void setUploadTime(String uploadTime) {
+        this.uploadTime = uploadTime;
     }
 
     public String getContent() {

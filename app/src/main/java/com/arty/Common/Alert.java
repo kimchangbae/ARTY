@@ -1,17 +1,10 @@
 package com.arty.Common;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.view.View;
-import android.widget.Toast;
-
-import com.arty.User.UserJoin;
-
 public class Alert {
 /*
     public void onClickShowAlert(View view) {
         AlertDialog.Builder myAlertBuilder =
-                new AlertDialog.Builder(UserJoin.class);
+                new AlertDialog.Builder(FirebaseAuth.class);
         // alert의 title과 Messege 세팅
         myAlertBuilder.setTitle("Alert");
         myAlertBuilder.setMessage("Click OK to continue, or Cancel to stop:");
