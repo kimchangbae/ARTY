@@ -17,7 +17,6 @@ import androidx.core.content.FileProvider;
 
 import com.arty.Common.TimeComponent;
 import com.arty.Main.MainActivity;
-import com.arty.Qna.QnaDetail;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -65,6 +64,7 @@ public class FreeBoardCommon extends AppCompatActivity {
         mKakao      = UserApiClient.getInstance();
         mDB         = FirebaseFirestore.getInstance();
         timeComponent = new TimeComponent();
+
         searchUserId();
     }
 

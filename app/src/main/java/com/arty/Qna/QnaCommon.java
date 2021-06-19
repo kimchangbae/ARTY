@@ -15,7 +15,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.arty.Common.ImageComponent;
+import com.arty.Common.TimeComponent;
 import com.arty.Main.MainActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -55,7 +55,9 @@ public class QnaCommon extends AppCompatActivity {
 
     protected       String      presentUserId;
     public          int         imageCount;
-    ImageComponent imageComponent;
+
+    public TimeComponent timeComponent;
+
     public QnaCommon() {
         Log.d(TAG,"QNA 생성자");
 
@@ -64,7 +66,7 @@ public class QnaCommon extends AppCompatActivity {
         mKakao      = UserApiClient.getInstance();
         mDB         = FirebaseFirestore.getInstance();
 
-        imageComponent = new ImageComponent();
+        timeComponent = new TimeComponent();
 
         searchUserId();
     }

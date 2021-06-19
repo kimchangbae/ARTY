@@ -20,24 +20,36 @@
                 android:id="@+id/vannerImage1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:scaleType="fitXY"
                 android:src="@drawable/vanner_image1" />
 
             <ImageButton
                 android:id="@+id/vannerImage2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:scaleType="fitXY"
                 android:src="@drawable/vanner_image2" />
 
             <ImageButton
                 android:id="@+id/imageButton4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:scaleType="fitXY"
                 android:src="@drawable/vanner_image3" />
 
             <ImageButton
                 android:id="@+id/imageButton5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:scaleType="fitXY"
                 android:src="@drawable/vanner_image4" />
         </LinearLayout>
     </ScrollView>

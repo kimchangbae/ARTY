@@ -108,7 +108,7 @@ public class QnaFragment extends CommonFragment {
                         for(QueryDocumentSnapshot document : task.getResult()) {
                             Qna qna = document.toObject(Qna.class);
                             qna.setUuId(document.getId());
-                            String time = ((MainActivity)getActivity()).timeComponent.switchTime(qna.getUploadTime());
+                            String time = timeComponent.switchTime(qna.getUploadTime());
                             qna.setUploadTime(time);
                             qnaList.add(qna);
 

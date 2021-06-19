@@ -31,7 +31,6 @@ public class FreeBoardFragment extends CommonFragment {
     static final String TAG             = "FreeBoardFragment";
 
 
-
     private RecyclerView.LayoutManager      layoutManager;
     private ArrayList<FreeBoard>            arrayList;
     private RecyclerView                    recyclerView;
@@ -110,7 +109,8 @@ public class FreeBoardFragment extends CommonFragment {
                             // TODO 문서를 메인페이지에 뿌려줄 데이터만 추려서 read 하게 수정할 필요가 있다.
                             FreeBoard board = document.toObject(FreeBoard.class);
                             board.setUuId(document.getId());
-                            String time = ((MainActivity)getActivity()).timeComponent.switchTime(board.getUploadTime());
+
+                            String time = timeComponent.switchTime(board.getUploadTime());
                             board.setUploadTime(time);
                             arrayList.add(board);
                         }
