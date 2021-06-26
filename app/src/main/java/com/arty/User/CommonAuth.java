@@ -2,25 +2,20 @@ package com.arty.User;
 
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
 import android.util.Patterns;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.arty.Main.MainActivity;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.kakao.sdk.user.UserApiClient;
-
-import static android.content.ContentValues.TAG;
 
 public class CommonAuth extends AppCompatActivity {
     final static String COLLECTION_PATH = "USER_ACCOUNT";
+
+    String pswdPattern  = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&]).{8,15}.$";
+    String pswdPattern2 = "((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9가-힣]).{8,16})";
 
     protected   FirebaseFirestore   mDB;
     protected   FirebaseAuth        mAuth;
@@ -32,48 +27,7 @@ public class CommonAuth extends AppCompatActivity {
         mKakao  = UserApiClient.getInstance();
     }
 
-    public void getUserId(String email) {
-        mDB.collection(COLLECTION_PATH)
-            .whereEqualTo("email",email)
-            .get()
-            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(Task<QuerySnapshot> task) {
-                    if(task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String userId = (String) document.getData().get("userId");
-                            Log.d(TAG, "DB 에서 검색된 사용자 아이디(파이어베이스) : " + userId);
-                            String userIds = null;
-                        }
-                    }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    public void getUserId(long kakaoId) {
-        mDB.collection(COLLECTION_PATH)
-        .whereEqualTo("kakaoId",kakaoId)
-        .get()
-        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(Task<QuerySnapshot> task) {
-                if(task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        String userId = (String) document.getData().get("userId");
-                        Log.d(TAG, "DB 에서 검색된 사용자 아이디(카카오) : " + userId);
-
-                    }
-                }
-            }
-        }).addOnFailureListener(e -> e.printStackTrace());
-    }
-
-    protected void killARTY() {
+    protected void killApplication() {
         // 태스크를 백그라운드로 이동
         moveTaskToBack(true);
 
@@ -95,8 +49,8 @@ public class CommonAuth extends AppCompatActivity {
         return false;
     }
 
-    public void goToUserJoin() {
-        Intent intent = new Intent(this, FirebaseAuth.class);
+    public void goToFirebaseRegister() {
+        Intent intent = new Intent(this, RegisterFirebase.class);
         startActivity(intent);
     }
 
@@ -106,8 +60,8 @@ public class CommonAuth extends AppCompatActivity {
         finish();
     }
 
-    public void goTokakaoAuth() {
-        Intent intent = new Intent(this, KakaoAuth.class);
+    public void goTokakaoRegister() {
+        Intent intent = new Intent(this, RegisterKakao.class);
         startActivity(intent);
         finish();
     }

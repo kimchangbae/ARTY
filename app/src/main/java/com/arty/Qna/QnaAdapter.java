@@ -16,7 +16,7 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
-    ArrayList<Qna> qnaList = new ArrayList<Qna>();
+    private ArrayList<Qna> qnaList;
     private Context context;
 
     QnaClickListener listener;
@@ -28,6 +28,10 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
     public QnaAdapter(ArrayList<Qna> qnaLists, Context context) {
         this.qnaList = qnaLists;
         this.context = context;
+    }
+
+    public void setQnaList(ArrayList<Qna> qnaList) {
+        this.qnaList = qnaList;
     }
 
     public void addItem(Qna item) {
@@ -68,12 +72,7 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
         holder.tv_contentType.setText(qnaList.get(position).getContentType());
         holder.tv_userId.setText(qnaList.get(position).getUserId());
         Glide.with(holder.itemView).load(qnaList.get(position).getImage1()).into(holder.imageView);
-
-
         holder.tv_uploadDate.setText(qnaList.get(position).getUploadTime());
-
-        //FreeBoard item = qnaLists.get(position);
-        //holder.setItem(item);
     }
 
     @Override

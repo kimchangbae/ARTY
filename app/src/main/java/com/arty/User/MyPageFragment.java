@@ -8,26 +8,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.arty.Main.MainActivity;
 import com.arty.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.kakao.sdk.auth.AuthApiClient;
 import com.kakao.sdk.user.UserApiClient;
-import com.kakao.sdk.user.model.User;
-
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
-import kotlin.jvm.functions.Function2;
 
 public class MyPageFragment extends Fragment {
     private static String TAG = "MyPageFragment";
-    private static String COLLECTION_PATH = "USER_ACCOUNT";
 
     private FirebaseAuth        mAuth;
     private UserApiClient       mKakao;
@@ -37,10 +31,16 @@ public class MyPageFragment extends Fragment {
     Button btn_logout, btn_withdraw, btn_add;
     private String userId;
 
+    private MyPageViewModel myPageViewModel;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG,"ON CREATE --> MyPageFragment");
+        ((MainActivity)getActivity()).navigation = "myPage";
+
+        myPageViewModel = new ViewModelProvider(this,
+                new ViewModelProvider.AndroidViewModelFactory(getActivity().getApplication())).get(MyPageViewModel.class);
 
         mAuth       = FirebaseAuth.getInstance();
         mKakao      = UserApiClient.getInstance();
@@ -52,7 +52,7 @@ public class MyPageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG,"ON ON CREATE VIEW --> MyPageFragment");
-        ((MainActivity)getActivity()).navigation = "mypage";
+
         ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.fragment_mypage, container, false);
 
         btn_logout      = viewGroup.findViewById(R.id.btn_logout);
@@ -83,11 +83,11 @@ public class MyPageFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(mAuth.getCurrentUser() != null) {
-                    firebaseLogout();
+                    myPageViewModel.firebaseLogout();
                 } else {
-                    kakaoTalkLogout();
+                    myPageViewModel.kakaoTalkLogout();
                 }
-                goToLogin();
+                goToLoginActivity();
             }
         });
 
@@ -95,116 +95,24 @@ public class MyPageFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(mAuth.getCurrentUser() != null) {
-                    firebaseWithdraw();
+                    myPageViewModel.firebaseWithdrawal();
                 } else {
-                    kakaoTalkWithdraw();
+                    myPageViewModel.kakaoTalkWithdrawal();
                 }
+            }
+        });
 
-                goToLogin();
+        myPageViewModel.getWithdrawalResult().observeForever(aBoolean -> {
+            if(aBoolean) {
+                Toast.makeText(getContext(),"회원탈퇴 완료",Toast.LENGTH_SHORT).show();
+                goToLoginActivity();
             }
         });
     }
 
-    private void goToLogin() {
+    private void goToLoginActivity() {
         Intent intent = new Intent(getActivity(), Login.class);
         startActivity(intent);
         getActivity().finish();
     }
-
-    // 파이어베이스 로그아웃
-    private void firebaseLogout() {
-        mAuth.getInstance().signOut();
-        Log.d(TAG,"----------------------------------------------------");
-        Log.d(TAG, "파이어베이스 로그아웃 테넨트ID [" + mAuth.getTenantId() +"]");
-        Log.d(TAG,"----------------------------------------------------");
-    }
-
-    // 파이어베이스 회원탈퇴
-    private void firebaseWithdraw() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        user.delete().addOnCompleteListener(task -> {
-            Log.d(TAG,"----------------------------------------------------");
-            Log.d(TAG, "파이어베이스 회원탈퇴 [Email : " +user.getEmail()+ "]");
-            Log.d(TAG,"----------------------------------------------------");
-
-            mDB
-            .collection(COLLECTION_PATH)
-            .whereEqualTo("email",user.getEmail())
-            .get()
-            .addOnCompleteListener(tasks -> {
-                if(tasks.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : tasks.getResult()) {
-                        String documentId = document.getId();
-                        Log.d(TAG, "파이어베이스 회원탈퇴 문서 ID : [" +documentId+ "]");
-
-                        mDB.collection(COLLECTION_PATH).document(documentId).delete()
-                        .addOnCompleteListener(task1 -> {
-                            Log.d(TAG,"파이어베이스 " + user + " 회원의 탈퇴가 완료 되었습니다.");
-                        });
-                    }
-                }
-            });
-        });
-
-    }
-
-    // 카카오톡 로그아웃
-    private void kakaoTalkLogout() {
-        mKakao = UserApiClient.getInstance();
-        mKakao.logout(new Function1<Throwable, Unit>() {
-            @Override
-            public Unit invoke(Throwable throwable) {
-                Log.d(TAG,"----------------------------------------------------");
-                Log.d(TAG, "카카오톡 로그아웃");
-                Log.d(TAG,"----------------------------------------------------");
-
-                if(throwable != null) {
-                    Log.d(TAG,"----------------------------------------------------");
-                    Log.d(TAG, "카카오톡 로그아웃 에러 발생" + throwable.getMessage());
-                    Log.d(TAG,"----------------------------------------------------");
-                }
-                return null;
-            }
-        });
-    }
-
-    // 카카오톡 회원탈퇴
-    public void kakaoTalkWithdraw(){
-        UserApiClient.getInstance().me(function2);
-        mKakao.unlink(throwable -> {
-            Log.d(TAG, "카카오톡 회원탈퇴");
-
-            if(throwable != null) {
-                Log.d(TAG,"----------------------------------------------------");
-                Log.d("AuthApplication", "카카오톡 회원탈퇴 에러 발생" + throwable.getMessage());
-                Log.d(TAG,"----------------------------------------------------");
-            }
-
-            return null;
-        });
-    }
-
-    Function2<User, Throwable, Unit> function2 = new Function2<User, Throwable, Unit>() {
-        @Override
-        public Unit invoke(User user, Throwable throwable) {
-            mDB
-            .collection(COLLECTION_PATH)
-            .whereEqualTo("kakaoId",user.getId())
-            .get()
-            .addOnCompleteListener(tasks -> {
-                if(tasks.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : tasks.getResult()) {
-                        String documentId = document.getId();
-                        Log.d(TAG, "카카오톡 회원탈퇴 문서 ID : [" +documentId+ "]");
-
-                        mDB.collection(COLLECTION_PATH).document(documentId).delete()
-                        .addOnCompleteListener(task1 -> {
-                            Log.d(TAG,"카카오톡 " + user + " 회원의 탈퇴가 완료 되었습니다.");
-                        });
-                    }
-                }
-            });
-            return null;
-        }
-    };
 }

@@ -56,7 +56,7 @@ public class NavigationBottom extends Fragment {
         if(navigation.equals("ai"))     transaction.replace(R.id.frame, qnaMainFragment).commit();
         if(navigation.equals("free"))   transaction.replace(R.id.frame, freeBoardFragment).commit();
         //if(navigaton.equals("market")) transaction.replace(R.id.frame, mainFragment).commit();
-        if(navigation.equals("mypage")) transaction.replace(R.id.frame, myPageFragment).commit();
+        if(navigation.equals("myPage")) transaction.replace(R.id.frame, myPageFragment).commit();
 
         return viewGroup;
     }

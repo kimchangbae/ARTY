@@ -4,7 +4,7 @@ public class Alert {
 /*
     public void onClickShowAlert(View view) {
         AlertDialog.Builder myAlertBuilder =
-                new AlertDialog.Builder(FirebaseAuth.class);
+                new AlertDialog.Builder(RegisterFirebase.class);
         // alert의 title과 Messege 세팅
         myAlertBuilder.setTitle("Alert");
         myAlertBuilder.setMessage("Click OK to continue, or Cancel to stop:");

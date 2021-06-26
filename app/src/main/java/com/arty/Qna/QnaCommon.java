@@ -15,15 +15,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.arty.Common.TimeComponent;
 import com.arty.Main.MainActivity;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.kakao.sdk.auth.AuthApiClient;
 import com.kakao.sdk.user.UserApiClient;
@@ -39,12 +33,9 @@ import kotlin.jvm.functions.Function2;
 
 public class QnaCommon extends AppCompatActivity {
     static final    String      TAG                     = "QnaCommon";
-    protected       String      timeStamp               = new SimpleDateFormat("yyyy/MM/dd_HH:mm:ss").format(new Date());
     static final    int         UPLOAD_MAXIMUM_SIZE     = 3;   // 최대 이미지 등록 갯수
-    static final    String      COLLECTION_NAME         = "QNA_BOARD";
     static final    String      IMAGE_FILE_PRE_PATH     = "QNA_BOARD_IMG/";
 
-    private         Uri         photoURI;
     public          String      imgaeFilePath;
 
     protected       FirebaseStorage     storage;
@@ -53,81 +44,33 @@ public class QnaCommon extends AppCompatActivity {
     protected       FirebaseFirestore   mDB;
 
 
-    protected       String      presentUserId;
+    protected       String      userId;
     public          int         imageCount;
 
-    public TimeComponent timeComponent;
-
     public QnaCommon() {
-        Log.d(TAG,"QNA 생성자");
-
-        storage     = FirebaseStorage.getInstance();
-        mAuth       = FirebaseAuth.getInstance();
-        mKakao      = UserApiClient.getInstance();
-        mDB         = FirebaseFirestore.getInstance();
-
-        timeComponent = new TimeComponent();
-
-        searchUserId();
+        Log.d(TAG,"QnaCommon 생성자");
     }
 
-    public void searchUserId() {
+    public void searchUserId(QnaViewModel qnaViewModel) {
+        mAuth       = FirebaseAuth.getInstance();
+        mKakao      = UserApiClient.getInstance();
+
         Log.d(TAG,"QNA.searchUserId");
         if(mAuth.getCurrentUser() != null) {
             Log.d(TAG,"mAuth ID ---> " + mAuth.getCurrentUser().getEmail());
-            getUserId(mAuth.getCurrentUser().getEmail());
+            qnaViewModel.getUserId(mAuth.getCurrentUser().getEmail());
         } else if(AuthApiClient.getInstance().hasToken()) {
             mKakao.me(new Function2<User, Throwable, Unit>() {
                 @Override
                 public Unit invoke(User user, Throwable throwable) {
                     if(user != null) {
                         Log.d(TAG,"mKakao ID ---> " + user.getId());
-                        getUserId(user.getId());
+                        qnaViewModel.getUserId(user.getId());
                     }
                     return null;
                 }
             });
         }
-    }
-
-    public void getUserId(String email) {
-        mDB.collection("USER_ACCOUNT")
-                .whereEqualTo("email",email)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(Task<QuerySnapshot> task) {
-                        if(task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                presentUserId = (String) document.getData().get("userId");
-                                Log.d(TAG, "DB 에서 검색된 사용자 아이디(파이어베이스) : " + presentUserId);
-                            }
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    public void getUserId(long kakaoId) {
-        mDB.collection("USER_ACCOUNT")
-                .whereEqualTo("kakaoId",kakaoId)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(Task<QuerySnapshot> task) {
-                        if(task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                presentUserId = (String) document.getData().get("userId");
-                                Log.d(TAG, "DB 에서 검색된 사용자 아이디(카카오) : " + presentUserId);
-
-                            }
-                        }
-                    }
-                }).addOnFailureListener(e -> e.printStackTrace());
     }
 
     public void changeImgUpCount(TextView textView, String str) {
@@ -142,7 +85,6 @@ public class QnaCommon extends AppCompatActivity {
         else textView.setTextColor(Color.WHITE);
     }
 
-    
     // 사진 촬영
     public Uri takingPicture() {
         Uri photoURI = null;
@@ -241,17 +183,17 @@ public class QnaCommon extends AppCompatActivity {
     public int getUriCount(Uri[] uris, Uri[] beforeUris, boolean[] isSwitch) {
         int j = 0;
         for (int i = 0; i < uris.length; i++) {
-
             if(uris[i] != null && !(uris[i].equals(beforeUris[i]))) {
                 Log.d(TAG,i+"번째 수정");
                 j++;
-
             } else if(uris[i] == null && isSwitch[i]) {
                 Log.d(TAG,i+"번째 삭제");
                 j++;
-
+            } else {
+                Log.d(TAG,i+"번째 변동없음");
             }
         }
+        Log.d(TAG,"총 이미지 수정작업횟수 : " + j);
         return j;
     }
 

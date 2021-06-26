@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".User.KakaoAuth">
+    tools:context=".User.RegisterKakao">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,7 +30,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:onClick="validationUserId"
             android:text="중복" />
 
     </LinearLayout>

@@ -62,19 +62,17 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btn_take_photo"
+            android:id="@+id/btn_qna_update_take_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="onClickTakePicture"
             android:text="사진촬영" />
 
         <Button
-            android:id="@+id/btn_call_photo"
+            android:id="@+id/btn_qna_update_call_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="onClickGetPicture"
             android:text="사진 불러오기" />
     </LinearLayout>
 
@@ -135,11 +133,10 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btn_update_qna"
+            android:id="@+id/btn_update_question"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="onClickUpdateQna"
             android:text="수정하기" />
 
         <Button

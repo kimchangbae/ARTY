@@ -44,8 +44,8 @@ public class FreeBoardDetail extends FreeBoardCommon implements Serializable {
         image1          = findViewById(R.id.imageDetail_1);
         image2          = findViewById(R.id.imageDetail_2);
         image3          = findViewById(R.id.imageDetail_3);
-        btn_update      = findViewById(R.id.btn_update);
-        btn_delete      = findViewById(R.id.btn_delete);
+        btn_update      = findViewById(R.id.btn_detail_update);
+        btn_delete      = findViewById(R.id.btn_detail_delete);
 
         image1.setVisibility(View.GONE);
         image2.setVisibility(View.GONE);

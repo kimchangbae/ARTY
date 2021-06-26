@@ -36,14 +36,14 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btn_take_photo"
+            android:id="@+id/btn_qna_insert_take_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="사진촬영" />
 
         <Button
-            android:id="@+id/btn_call_photo"
+            android:id="@+id/btn_qna_insert_call_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -115,7 +115,7 @@
 
 
         <Button
-            android:id="@+id/btn_write_qna"
+            android:id="@+id/btn_insert_question"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onClickWriteQna"

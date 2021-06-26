@@ -69,7 +69,7 @@ public class FreeBoardWrite extends FreeBoardCommon {
         super.onStart();
 
         // 사진 촬영
-        findViewById(R.id.btn_take_photo).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_qna_insert_take_photo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                onClickTakePicture();
@@ -77,7 +77,7 @@ public class FreeBoardWrite extends FreeBoardCommon {
         });
 
         // 사진 불러오기
-        findViewById(R.id.btn_call_photo).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_qna_insert_call_photo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onClickGetPicture();

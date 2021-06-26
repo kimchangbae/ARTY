@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -15,36 +16,22 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.arty.Common.CommonFragment;
 import com.arty.Main.MainActivity;
 import com.arty.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
 
 public class QnaFragment extends CommonFragment {
-    static final String COLLECTION_NAME = "QNA_BOARD";
-    static final String TAG             = "QnaFragment";
+    private static final String TAG             = "QnaFragment";
 
     private SwipeRefreshLayout              swipeRefreshLayout = null;
     private QnaAdapter                      qnaAdapter;
     private RecyclerView.LayoutManager      layoutManager;
-    private ArrayList<Qna>                  qnaList;
     private RecyclerView                    recyclerView;
-
-    private FirebaseFirestore               mDB;
-    private CollectionReference             cRef;
+    private QnaViewModel                    qnaViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG,"QNA onCreateView-----------------------");
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_qna, container, false);
         ((MainActivity)getActivity()).navigation = "ai";
-        mDB = FirebaseFirestore.getInstance();
 
         swipeRefreshLayout = rootView.findViewById(R.id.refreshQnaFragment);
 
@@ -53,21 +40,35 @@ public class QnaFragment extends CommonFragment {
         layoutManager = new LinearLayoutManager(inflater.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        drawingRecyclerView();
+        qnaViewModel = new ViewModelProvider(this,
+                new ViewModelProvider.AndroidViewModelFactory(getActivity().getApplication())).get(QnaViewModel.class);
+
+        qnaAdapter = new QnaAdapter(null);
+
+        qnaViewModel.selectQnaList();
+
+        qnaViewModel.getQnaLists().observeForever(listData -> {
+            Log.d(TAG,"listData --> " + listData);
+
+                qnaAdapter.notifyDataSetChanged();
+                qnaAdapter.setQnaList(listData);
+                recyclerView.setAdapter(qnaAdapter); // 리싸이클러뷰에 어댑터 연결
+                swipeRefreshLayout.setRefreshing(false);
+        });
 
         return rootView;
     }
 
     @Override
-    public void onStart() {
-        Log.d(TAG,"큐앤에이 onStart");
-        super.onStart();
-        
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG,"QNA onViewCreated--------------------");
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 Log.d(TAG,"QNA 게시판 새로고침");
-                drawingRecyclerView();
+                qnaViewModel.selectQnaList();
             }
         });
 
@@ -94,38 +95,5 @@ public class QnaFragment extends CommonFragment {
     public void writeQna(View v) {
         Intent intent = new Intent(getActivity(), QnaPopup.class);
         startActivity(intent);
-    }
-
-    private void drawingRecyclerView() {
-        qnaList = new ArrayList<>();
-        cRef = mDB.collection(COLLECTION_NAME);
-        cRef.orderBy("uploadTime", Query.Direction.DESCENDING)
-            .get()
-            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(Task<QuerySnapshot> task) {
-                    if(task.isSuccessful()) {
-                        for(QueryDocumentSnapshot document : task.getResult()) {
-                            Qna qna = document.toObject(Qna.class);
-                            qna.setUuId(document.getId());
-                            String time = timeComponent.switchTime(qna.getUploadTime());
-                            qna.setUploadTime(time);
-                            qnaList.add(qna);
-
-
-                        }
-                        qnaAdapter.notifyDataSetChanged();
-                    }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(Exception e) {
-                Log.e(TAG,e.getMessage());
-            }
-        });
-
-        qnaAdapter = new QnaAdapter(qnaList);
-        recyclerView.setAdapter(qnaAdapter); // 리싸이클러뷰에 어댑터 연결
-        swipeRefreshLayout.setRefreshing(false);
     }
 }
