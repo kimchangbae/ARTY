@@ -1,8 +1,8 @@
 package com.arty.User;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.arty.Main.MainActivity;
 import com.arty.R;
 import com.google.firebase.auth.FirebaseUser;
 import com.kakao.sdk.auth.model.OAuthToken;
@@ -21,7 +22,7 @@ import kotlin.jvm.functions.Function2;
 
 @RequiresApi(api = Build.VERSION_CODES.P)
 public class Login extends CommonAuth {
-    private static String TAG = "Login";
+    private static final String TAG = "Login";
 
     private long clickTime = 0;
 
@@ -131,10 +132,16 @@ public class Login extends CommonAuth {
     /*
      * 로그인 화면에서 뒤로가기 이벤트
      * */
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // 뒤로가기 버튼 클릭 시
+
         if(keyCode == KeyEvent.KEYCODE_BACK) {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return true;
+            /*
             if(SystemClock.elapsedRealtime() - clickTime < 2000) {
                 Toast.makeText(getApplicationContext(), "프로그램이 종료 되었습니다.", Toast.LENGTH_SHORT).show();
                 killApplication();
@@ -143,6 +150,7 @@ public class Login extends CommonAuth {
             }
             clickTime = SystemClock.elapsedRealtime();
             Toast.makeText(getApplicationContext(), "한번 더 누르면 종료 됩니다.", Toast.LENGTH_SHORT).show();
+             */
         }
         return false;
     }

@@ -36,6 +36,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
         android:layout_weight="1">
 
         <LinearLayout
@@ -44,25 +45,38 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_fb_dt_userId"
+                android:id="@+id/tv_qna_detail_type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:text="질문 타입"
+                android:textColor="#6B6868" />
+
+            <TextView
+                android:id="@+id/tv_qna_detail_userId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
                 android:text="작성자"
                 android:textColor="#000000"
-                android:textSize="30sp" />
+                android:textSize="20dp" />
 
             <TextView
-                android:id="@+id/tv_fb_dt_uploadTime"
+                android:id="@+id/tv_qna_detail_uploadTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
                 android:text="작성시간"
                 android:textColor="#000000"
-                android:textSize="30sp" />
+                android:textSize="20dp" />
 
             <TextView
-                android:id="@+id/tv_fb_dt_content"
+                android:id="@+id/tv_qna_detail_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
                 android:text="내용"
                 android:textColor="#000000"
                 android:textSize="30sp" />
@@ -72,6 +86,8 @@
                 android:layout_width="300dp"
                 android:layout_height="300dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:visibility="visible"
                 tools:srcCompat="@tools:sample/avatars" />
 
@@ -80,6 +96,8 @@
                 android:layout_width="300dp"
                 android:layout_height="300dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:visibility="visible"
                 tools:srcCompat="@tools:sample/avatars" />
 
@@ -88,11 +106,13 @@
                 android:layout_width="300dp"
                 android:layout_height="300dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:visibility="visible"
                 tools:srcCompat="@tools:sample/avatars" />
 
             <TextView
-                android:id="@+id/tv_coment_count"
+                android:id="@+id/tv_comment_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -101,12 +121,10 @@
                 android:textSize="25sp"
                 android:textStyle="bold" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/qnaComentRecyclerView"
+            <FrameLayout
+                android:id="@+id/CommentFrameLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp" />
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </ScrollView>
@@ -149,7 +167,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="visible">
 
             <EditText
                 android:id="@+id/edit_coment"
@@ -163,7 +182,7 @@
                 android:textColor="#000000" />
 
             <Button
-                android:id="@+id/btn_write_qna_coment"
+                android:id="@+id/btn_write_qna_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="댓글달기" />

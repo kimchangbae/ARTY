@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FCFCFC"
     android:orientation="vertical"
     tools:context=".Qna.QnaWrite">
 
@@ -18,6 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="내용"
+            android:textColor="@color/black"
             android:textSize="22sp" />
 
         <EditText
@@ -58,13 +60,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="업로드 사진제한" />
+            android:text="업로드 사진제한"
+            android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/tv_upload_maximum"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp" />
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/black" />
     </LinearLayout>
 
     <LinearLayout
@@ -118,7 +122,6 @@
             android:id="@+id/btn_insert_question"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClickWriteQna"
             android:text="등록하기" />
 
     </LinearLayout>

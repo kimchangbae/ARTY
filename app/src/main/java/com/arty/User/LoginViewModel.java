@@ -21,10 +21,13 @@ public class LoginViewModel extends AndroidViewModel {
         mutableLiveData = authRepository.getMutableLiveData();
     }
 
+    public MutableLiveData<String> getMutableLiveData() {
+        return mutableLiveData;
+    }
+
     public void register(String email, String password) {
         authRepository.register(email, password);
     }
-
 
     public void login(String email, String password) {
         authRepository.login(email, password);
@@ -34,7 +37,5 @@ public class LoginViewModel extends AndroidViewModel {
         authRepository.kakaoLogin();
     }
 
-    public MutableLiveData<String> getMutableLiveData() {
-        return mutableLiveData;
-    }
+
 }

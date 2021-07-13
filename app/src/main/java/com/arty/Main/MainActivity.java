@@ -25,16 +25,17 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG         = "MainActivity";
+    private static final String TAG = "MainActivity";
+    private long clickTime = 0;
 
-    FragmentManager fragmentManager;
-    FragmentTransaction transaction;
+    private FragmentManager fragmentManager;
+    private FragmentTransaction transaction;
 
-    ToolBar             toolBar;
-    NavigationBottom    bottomNavigation;
+    private ToolBar             toolBar;
+    private NavigationBottom    bottomNavigation;
 
-    protected   FirebaseAuth        mAuth;
-    protected UserApiClient         mKakao;
+    protected  FirebaseAuth        mAuth;
+    protected  UserApiClient       mKakao;
 
     public static String userId;
     public static String navigation;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private MainViewModel mainViewModel;
 
     public MainActivity() {
+        Log.d(TAG,"Init--Main");
         navigation = "main";
         userId = null;
     }
@@ -59,11 +61,11 @@ public class MainActivity extends AppCompatActivity {
         mAuth       = FirebaseAuth.getInstance();
         mKakao      = UserApiClient.getInstance();
 
-        fragmentManager     = getSupportFragmentManager();
-        transaction         = fragmentManager.beginTransaction();
+        // fragmentManager     = getSupportFragmentManager();
+        // transaction         = fragmentManager.beginTransaction();
 
-        toolBar             = (ToolBar)  fragmentManager.findFragmentById(R.id.toolBar);
-        bottomNavigation    = (NavigationBottom) fragmentManager.findFragmentById(R.id.navigation);
+        // toolBar             = (ToolBar)  fragmentManager.findFragmentById(R.id.toolBar);
+        // bottomNavigation    = (NavigationBottom) fragmentManager.findFragmentById(R.id.navigation);
 
         Log.d(TAG,"접속해서 유저아이디 조회하기");
 
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void searchUserId() {
+    private void searchUserId() {
         if(mAuth.getCurrentUser() != null) {
             Log.d(TAG,"mAuth ID ---> " + mAuth.getCurrentUser().getEmail());
             mainViewModel.getUserId(mAuth.getCurrentUser().getEmail());
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private long clickTime = 0;
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

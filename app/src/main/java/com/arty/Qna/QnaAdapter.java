@@ -68,11 +68,18 @@ public class QnaAdapter extends RecyclerView.Adapter<QnaAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(QnaAdapter.ViewHolder holder, int position) {
-        holder.tv_content.setText(qnaList.get(position).getContent());
         holder.tv_contentType.setText(qnaList.get(position).getContentType());
         holder.tv_userId.setText(qnaList.get(position).getUserId());
         Glide.with(holder.itemView).load(qnaList.get(position).getImage1()).into(holder.imageView);
         holder.tv_uploadDate.setText(qnaList.get(position).getUploadTime());
+
+
+        if(qnaList.get(position).getContent().length() >= 13) {
+            String content = qnaList.get(position).getContent().substring(0, 12).concat("...");
+            holder.tv_content.setText(content);
+        } else {
+            holder.tv_content.setText(qnaList.get(position).getContent());
+        }
     }
 
     @Override

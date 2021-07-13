@@ -19,7 +19,7 @@ import com.arty.R;
 
 public class MainFragment extends Fragment {
     private static String TAG = "MainFragment";
-    private SwipeRefreshLayout refreshLayout = null;
+    private SwipeRefreshLayout swipeRefreshLayout = null;
     private String userId;
     Button btn_add;
     ImageButton vanner1, vanner2;
@@ -39,7 +39,8 @@ public class MainFragment extends Fragment {
         Log.d(TAG,"onCreateView--------------");
         ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.fragment_main, container, false);
         ((MainActivity)getActivity()).navigation = "main";
-        refreshLayout = viewGroup.findViewById(R.id.refreshMainLayout);
+
+        swipeRefreshLayout = viewGroup.findViewById(R.id.refreshMainLayout);
         userId = ((MainActivity)getActivity()).userId;
 
         btn_add = getActivity().findViewById(R.id.btn_add);
@@ -66,6 +67,13 @@ public class MainFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
 
         vanner1.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/refreshMainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FCFCFC"
     tools:context=".Main.MainFragment">
 
     <ScrollView
@@ -20,37 +22,49 @@
                 android:id="@+id/vannerImage1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
                 android:layout_marginBottom="5dp"
+                android:background="#FCFCFC"
                 android:scaleType="fitXY"
-                android:src="@drawable/vanner_image1" />
+                android:src="@drawable/v1" />
 
             <ImageButton
                 android:id="@+id/vannerImage2"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="180dp"
+                android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
                 android:layout_marginBottom="5dp"
+                android:background="#FCFCFC"
                 android:scaleType="fitXY"
-                android:src="@drawable/vanner_image2" />
+                android:src="@drawable/v2" />
 
             <ImageButton
                 android:id="@+id/imageButton4"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="180dp"
+                android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
                 android:layout_marginBottom="5dp"
+                android:background="#FCFCFC"
                 android:scaleType="fitXY"
-                android:src="@drawable/vanner_image3" />
+                android:src="@drawable/v3" />
 
             <ImageButton
                 android:id="@+id/imageButton5"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="180dp"
+                android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
                 android:layout_marginBottom="5dp"
+                android:background="#FCFCFC"
                 android:scaleType="fitXY"
-                android:src="@drawable/vanner_image4" />
+                android:src="@drawable/v4" />
         </LinearLayout>
     </ScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

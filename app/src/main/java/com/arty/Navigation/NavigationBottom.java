@@ -1,5 +1,6 @@
 package com.arty.Navigation;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,8 @@ import com.arty.Main.MainActivity;
 import com.arty.Main.MainFragment;
 import com.arty.Qna.QnaFragment;
 import com.arty.R;
+import com.arty.User.Login;
+import com.arty.User.MyPage;
 import com.arty.User.MyPageFragment;
 
 import static android.content.ContentValues.TAG;
@@ -24,13 +27,13 @@ public class NavigationBottom extends Fragment {
 
     Button mainPage, aiPage, freePage, marketPage, myPage;
 
-    MainFragment        mainFragment;
-    QnaFragment         qnaMainFragment;
-    FreeBoardFragment   freeBoardFragment;
-    MyPageFragment      myPageFragment;
+    private MainFragment        mainFragment;
+    private QnaFragment         qnaMainFragment;
+    private FreeBoardFragment   freeBoardFragment;
+    private MyPageFragment      myPageFragment;
 
-    FragmentManager     fragmentManager;
-    FragmentTransaction transaction;
+    private FragmentManager     fragmentManager;
+    private FragmentTransaction transaction;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,12 +54,13 @@ public class NavigationBottom extends Fragment {
         fragmentManager = getActivity().getSupportFragmentManager();
         transaction     = fragmentManager.beginTransaction();
 
-        String navigation = ((MainActivity)getActivity()).navigation;
+        String navigation   = ((MainActivity)getActivity()).navigation;
+
         if(navigation.equals("main"))   transaction.replace(R.id.frame, mainFragment).commit();
         if(navigation.equals("ai"))     transaction.replace(R.id.frame, qnaMainFragment).commit();
         if(navigation.equals("free"))   transaction.replace(R.id.frame, freeBoardFragment).commit();
-        //if(navigaton.equals("market")) transaction.replace(R.id.frame, mainFragment).commit();
-        if(navigation.equals("myPage")) transaction.replace(R.id.frame, myPageFragment).commit();
+        // if(navigaton.equals("market")) transaction.replace(R.id.frame, mainFragment).commit();
+        // if(navigation.equals("myPage")) transaction.replace(R.id.frame, myPageFragment).commit();
 
         return viewGroup;
     }
@@ -95,9 +99,32 @@ public class NavigationBottom extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d(TAG,"OnClickListener----> 마이페이지 호출");
-                transaction     = fragmentManager.beginTransaction();
-                transaction.replace(R.id.frame, myPageFragment).commit();
+                try {
+                    if(((MainActivity)getActivity()).userId != null) {
+                        // goMyPage();
+                        transaction     = fragmentManager.beginTransaction();
+                        transaction.replace(R.id.frame, myPageFragment).commit();
+                    } else {
+                        goToLoginActivity();
+                    }
+
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage());
+                }
+
             }
         });
+    }
+
+    private void goMyPage() {
+        Intent intent = new Intent(getActivity(), MyPage.class);
+        startActivity(intent);
+        getActivity().finish();
+    }
+
+    private void goToLoginActivity() {
+        Intent intent = new Intent(getActivity(), Login.class);
+        startActivity(intent);
+        getActivity().finish();
     }
 }

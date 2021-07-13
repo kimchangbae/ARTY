@@ -28,10 +28,12 @@ public class MyPageFragment extends Fragment {
     private AuthApiClient       mKakaoAuth;
     private FirebaseFirestore   mDB;
 
-    Button btn_logout, btn_withdraw, btn_add;
+    private Button btn_logout, btn_withdraw, btn_add;
     private String userId;
+    private TextView showUserId;
 
     private MyPageViewModel myPageViewModel;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,8 +65,12 @@ public class MyPageFragment extends Fragment {
 
         userId = ((MainActivity)getActivity()).userId;
 
-        TextView tv_show_id = viewGroup.findViewById(R.id.tv_show_id);
-        tv_show_id.setText(userId + " 님");
+        showUserId = viewGroup.findViewById(R.id.tv_show_id);
+        if(userId == null || userId.equals(null)) {
+            showUserId.setText("GUEST 님");
+        } else {
+            showUserId.setText(userId + " 님");
+        }
 
         return viewGroup;
     }
@@ -87,7 +93,8 @@ public class MyPageFragment extends Fragment {
                 } else {
                     myPageViewModel.kakaoTalkLogout();
                 }
-                goToLoginActivity();
+                // goToLoginActivity();
+                goToMainActivity();
             }
         });
 
@@ -105,13 +112,20 @@ public class MyPageFragment extends Fragment {
         myPageViewModel.getWithdrawalResult().observeForever(aBoolean -> {
             if(aBoolean) {
                 Toast.makeText(getContext(),"회원탈퇴 완료",Toast.LENGTH_SHORT).show();
-                goToLoginActivity();
+                // goToLoginActivity();
+                goToMainActivity();
             }
         });
     }
 
     private void goToLoginActivity() {
         Intent intent = new Intent(getActivity(), Login.class);
+        startActivity(intent);
+        getActivity().finish();
+    }
+
+    private void goToMainActivity() {
+        Intent intent = new Intent(getActivity(), MainActivity.class);
         startActivity(intent);
         getActivity().finish();
     }

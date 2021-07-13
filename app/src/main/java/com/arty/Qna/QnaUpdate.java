@@ -42,33 +42,13 @@ public class QnaUpdate extends QnaCommon {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.qna_update);
 
-        qnaViewModel = new ViewModelProvider(this,
-                new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(QnaViewModel.class);
-
-        contentType     = findViewById(R.id.edit_contentType);
-        content         = findViewById(R.id.in_content);
-        image1          = findViewById(R.id.updateImage1);
-        image2          = findViewById(R.id.updateImage2);
-        image3          = findViewById(R.id.updateImage3);
-        update_maximum  = findViewById(R.id.tv_update_maximum);
-        takePhoto       = findViewById(R.id.btn_qna_update_take_photo);
-        callPhoto       = findViewById(R.id.btn_qna_update_call_photo);
-        update          = findViewById(R.id.btn_update_question);
-
-        isImageSwitch   = new boolean[UPLOAD_MAXIMUM_SIZE];
-        uris            = new Uri[UPLOAD_MAXIMUM_SIZE];
-        beforeUris      = new Uri[UPLOAD_MAXIMUM_SIZE];
-
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setMessage("수정중");
+        initViewData();
 
         qna             = getIntent().getParcelableExtra("qna");
         filePath        = qna.getFilePath();    // storage 경로
 
         imageCount = 0;
         update_maximum.setText(imageCount + " / " + UPLOAD_MAXIMUM_SIZE);
-
 
         // 기본 정보
         contentType.setText(qna.getContentType());
@@ -97,11 +77,6 @@ public class QnaUpdate extends QnaCommon {
             uris[2] = Uri.parse(qna.getImage3());
             beforeUris[2] = Uri.parse(qna.getImage3());
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         qnaViewModel.getUserId().observeForever(userId -> {
             Log.d(TAG,"userId --> " + userId);
@@ -109,28 +84,13 @@ public class QnaUpdate extends QnaCommon {
         });
 
         // 사진 촬영
-        takePhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickTakePicture();
-            }
-        });
+        takePhoto.setOnClickListener(v -> onClickTakePicture());
 
         // 사진 불러오기
-        callPhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickGetPicture();
-            }
-        });
+        callPhoto.setOnClickListener(v -> onClickGetPicture());
 
         // 질문글 업데이트
-        update.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateQuestion();
-            }
-        });
+        update.setOnClickListener(v -> updateQuestion());
 
         qnaViewModel.getUpdate().observeForever(aBoolean -> {
             if(aBoolean) {
@@ -152,7 +112,29 @@ public class QnaUpdate extends QnaCommon {
                 goToDetailActivity(qna.getUuId());
             }
         });
+    }
 
+    private void initViewData() {
+        qnaViewModel = new ViewModelProvider(this,
+                new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(QnaViewModel.class);
+
+        contentType     = findViewById(R.id.edit_contentType);
+        content         = findViewById(R.id.in_content);
+        image1          = findViewById(R.id.updateImage1);
+        image2          = findViewById(R.id.updateImage2);
+        image3          = findViewById(R.id.updateImage3);
+        update_maximum  = findViewById(R.id.tv_update_maximum);
+        takePhoto       = findViewById(R.id.btn_qna_update_take_photo);
+        callPhoto       = findViewById(R.id.btn_qna_update_call_photo);
+        update          = findViewById(R.id.btn_update_question);
+
+        isImageSwitch   = new boolean[UPLOAD_MAXIMUM_SIZE];
+        uris            = new Uri[UPLOAD_MAXIMUM_SIZE];
+        beforeUris      = new Uri[UPLOAD_MAXIMUM_SIZE];
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setMessage("수정중");
     }
 
     // 사진 촬영 완료 or 사진 가져오기 완료 후 이벤트

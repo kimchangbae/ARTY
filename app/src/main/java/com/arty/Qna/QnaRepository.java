@@ -6,9 +6,11 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.arty.Comment.Comment;
 import com.arty.Common.TimeComponent;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -38,9 +40,13 @@ public class QnaRepository {
     private MutableLiveData<ArrayList<Comment>> commentLists;
     private MutableLiveData<Comment>            comment;
 
+    private MutableLiveData<Integer>   imageUploadCount;
+
     private FirebaseFirestore   mStore;
     private FirebaseStorage     mStorage;
     private FirebaseDatabase    mDB;
+
+    private int count = 0;
 
     public QnaRepository(Application app) {
         this.app = app;
@@ -52,12 +58,19 @@ public class QnaRepository {
         userId          = new MutableLiveData<>();
         commentLists    = new MutableLiveData<>();
         comment         = new MutableLiveData<>();
+        imageUploadCount = new MutableLiveData<>();
 
         mStore      = FirebaseFirestore.getInstance();
         mStorage    = FirebaseStorage.getInstance();
         mDB         = FirebaseDatabase.getInstance();
 
         timeComponent = new TimeComponent();
+
+
+    }
+
+    public MutableLiveData<Integer> getImageUploadCount() {
+        return imageUploadCount;
     }
 
     public MutableLiveData<ArrayList<Qna>> getQnaLists() {
@@ -92,7 +105,6 @@ public class QnaRepository {
             @Override
             public void onComplete(Task<QuerySnapshot> task) {
                 if(task.isSuccessful()) {
-                    Log.d(TAG,"QNA 게시판 조회");
                     for(QueryDocumentSnapshot document : task.getResult()) {
                         Qna qna = document.toObject(Qna.class);
                         qna.setUuId(document.getId());
@@ -165,8 +177,74 @@ public class QnaRepository {
         .addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(Exception e) {
-                Log.d(TAG,"문서 삭제 실패 [문서번호 : " + uuId+ "]");
-                Log.d(TAG, e.getMessage());
+                Log.d(TAG,"문서 [" + uuId+ "] 삭제 실패" + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void deleteComment(String uuId) {
+        Log.d(TAG,"문서 [" + uuId +"] 의 댓글 삭제 실행");
+
+        mStore.collection("COMMENT")
+        .whereEqualTo("uuId",uuId)
+        .get()
+        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                    for(QueryDocumentSnapshot snapshot : task.getResult()) {
+                        Log.d(TAG,"삭제 대기중인 부모 댓글 [" + snapshot.getId() +"]");
+
+                        mStore
+                        .collection("COMMENT")
+                        .document(snapshot.getId())
+                        .delete()
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(Task<Void> task) {
+                                Log.d(TAG,"부모 댓글 [" + snapshot.getId() + "] 삭제 완료 ");
+
+                                mStore
+                                .collection("COMMENT")
+                                .document(snapshot.getId())
+                                .collection("CHILD")
+                                .whereEqualTo("uuId", uuId)
+                                .get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(Task<QuerySnapshot> task) {
+                                        if(task.isSuccessful()) {
+                                            for (QueryDocumentSnapshot snapshot : task.getResult()) {
+                                                Log.d(TAG,"삭제 대기중인 자식 댓글 [" + snapshot.getId() +"]");
+
+                                                mStore
+                                                .collection("COMMENT")
+                                                .document(snapshot.getId())
+                                                .collection("CHILD")
+                                                .document(snapshot.getId())
+                                                .delete()
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        Log.d(TAG,"자식 댓글 [" + snapshot.getId() + "] 삭제 완료 ");
+                                                    }
+                                                }).addOnFailureListener(e -> Log.e(TAG, e.getMessage()));
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        }).addOnFailureListener(e -> Log.e(TAG, e.getMessage()));
+                    }
+                }
+            }
+        })
+        .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG,"문서 [" + uuId+ "] 삭제 실패" + e.getMessage());
+                e.printStackTrace();
             }
         });
     }
@@ -188,11 +266,13 @@ public class QnaRepository {
                     mStore.collection("QNA_BOARD")
                     .document(uuId)
                     .set(data,SetOptions.merge())
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(Task<Void> task) {
-                            Log.d(TAG,"Question 이미지 "+index+"번 등록 완료------------");
+                    .addOnCompleteListener(task1 -> {
+                        if(task1.isSuccessful()) {
+                            count++;
+                            Log.d(TAG,"[" + uuId + "] 이미지 "+index+"번 등록 완료------------["+count+"]");
+
                             imgUpResult.postValue(true);
+                            imageUploadCount.postValue(count);
                             data.clear();
                         }
                     });

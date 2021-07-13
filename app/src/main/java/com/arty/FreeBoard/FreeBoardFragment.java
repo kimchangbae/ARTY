@@ -84,8 +84,11 @@ public class FreeBoardFragment extends CommonFragment {
         getActivity().findViewById(R.id.btn_add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(),"자유게시글 추가",Toast.LENGTH_SHORT).show();
-                writeFreeBoard();
+                if(((MainActivity)getActivity()).userId != null) {
+                    writeFreeBoard();
+                } else {
+                    Toast.makeText(getContext(),"로그인 후 이용 가능합니다.",Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

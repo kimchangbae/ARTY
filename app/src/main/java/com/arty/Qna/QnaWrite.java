@@ -52,34 +52,11 @@ public class QnaWrite extends QnaCommon {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.qna_write);
+
         inputType(); // QnaPopup 액티비티에서 식물이아파요 or 식물이 궁금해요 선택한 정보를 화면에 뿌려준다.
 
-        qnaViewModel = new ViewModelProvider(this,
-                new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(QnaViewModel.class);
+        initViewData();
 
-        contentType     = findViewById(R.id.edit_contentType);
-        content         = findViewById(R.id.edit_content);
-        image1          = findViewById(R.id.insertImage1);
-        image2          = findViewById(R.id.insertImage2);
-        image3          = findViewById(R.id.insertImage3);
-        upload_maximum  = findViewById(R.id.tv_upload_maximum);
-
-        insert      = findViewById(R.id.btn_insert_question);
-        takePhoto   = findViewById(R.id.btn_qna_insert_take_photo);
-        callPhoto   = findViewById(R.id.btn_qna_insert_call_photo);
-
-        uris = new Uri[UPLOAD_MAXIMUM_SIZE];
-
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-
-        imageCount = 0;
-        upload_maximum.setText(imageCount + " / " + UPLOAD_MAXIMUM_SIZE);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         searchUserId(qnaViewModel);
         qnaViewModel.getUserId().observeForever(userId -> {
             Log.d(TAG,"userId --> " + userId);
@@ -110,15 +87,51 @@ public class QnaWrite extends QnaCommon {
             }
         });
 
-        qnaViewModel.getImgUpResult().observeForever(aBoolean -> {
-            Log.d(TAG,"이미지 업로드 결과 리턴");
-            if(aBoolean) writeStart++;
-            
-            if(writeStart == writeFinish) {
+        qnaViewModel.getImageUploadCount().observeForever(integer -> {
+            Log.d(TAG,"이미지 업로드 카운트 ---> [" +integer+"]");
+            if(integer == writeFinish) {
+                Log.d(TAG,"질문 등록 완료");
                 progressDialog.dismiss();
                 goToDetailActivity(uuidKey);
             }
         });
+
+/*
+        qnaViewModel.getImgUpResult().observeForever(aBoolean -> {
+            Log.d(TAG,"이미지 업로드 결과 리턴");
+            if(aBoolean) writeStart++;
+
+            if(writeStart == writeFinish) {
+                Log.d(TAG,"질문 등록 완료");
+                progressDialog.dismiss();
+                goToDetailActivity(uuidKey);
+            }
+        });
+*/
+    }
+
+    private void initViewData() {
+        qnaViewModel = new ViewModelProvider(this,
+                new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(QnaViewModel.class);
+
+        contentType     = findViewById(R.id.edit_contentType);
+        content         = findViewById(R.id.edit_content);
+        image1          = findViewById(R.id.insertImage1);
+        image2          = findViewById(R.id.insertImage2);
+        image3          = findViewById(R.id.insertImage3);
+        upload_maximum  = findViewById(R.id.tv_upload_maximum);
+
+        insert      = findViewById(R.id.btn_insert_question);
+        takePhoto   = findViewById(R.id.btn_qna_insert_take_photo);
+        callPhoto   = findViewById(R.id.btn_qna_insert_call_photo);
+
+        uris = new Uri[UPLOAD_MAXIMUM_SIZE];
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
+        imageCount = 0;
+        upload_maximum.setText(imageCount + " / " + UPLOAD_MAXIMUM_SIZE);
     }
 
     // 사진 촬영 완료 or 사진 가져오기 완료 후 이벤트

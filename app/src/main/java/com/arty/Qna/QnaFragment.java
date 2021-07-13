@@ -86,8 +86,11 @@ public class QnaFragment extends CommonFragment {
         getActivity().findViewById(R.id.btn_add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(),"QNA 추가",Toast.LENGTH_SHORT).show();
-                writeQna(v);
+                if(((MainActivity)getActivity()).userId != null) {
+                    writeQna(v);
+                } else {
+                    Toast.makeText(getContext(),"로그인 후 이용 가능합니다.",Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

@@ -6,11 +6,14 @@ import android.net.Uri;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.arty.Comment.Comment;
+import com.arty.Comment.CommentRepository;
+
 import java.util.ArrayList;
 
 public class QnaViewModel extends AndroidViewModel {
     private QnaRepository       qnaRepository;
-    private CommentRepository   commentRepository;
+    private CommentRepository commentRepository;
 
     private MutableLiveData<ArrayList<Qna>>     qnaLists;
     private MutableLiveData<Qna>                qnaItem;
@@ -19,6 +22,7 @@ public class QnaViewModel extends AndroidViewModel {
 
     private MutableLiveData<ArrayList<Comment>>     commentLists;
     private MutableLiveData<Comment>                comment;
+    private MutableLiveData<Integer>   imageUploadCount;
 
 
     public QnaViewModel(Application application) {
@@ -32,8 +36,14 @@ public class QnaViewModel extends AndroidViewModel {
         imgUpResult     = qnaRepository.getImgUpResult();
         update          = qnaRepository.getUpdate();
         userId          = qnaRepository.getUserId();
-        commentLists    = commentRepository.getCommentLists();
+        commentLists    = commentRepository.getpCommentLists();
         comment         = commentRepository.getComment();
+
+        imageUploadCount = qnaRepository.getImageUploadCount();
+    }
+
+    public MutableLiveData<Integer> getImageUploadCount() {
+        return imageUploadCount;
     }
 
     public MutableLiveData<ArrayList<Qna>> getQnaLists() {
@@ -84,6 +94,10 @@ public class QnaViewModel extends AndroidViewModel {
         qnaRepository.deleteQuestion(uuId);
     }
 
+    public void deleteComment(String uuId) {
+        qnaRepository.deleteComment(uuId);
+    }
+
     public void insertImage(String uuId, String filePath, Uri uri, int index) {
         qnaRepository.insertImage(uuId, filePath, uri, index);
     }
@@ -102,21 +116,5 @@ public class QnaViewModel extends AndroidViewModel {
 
     public void getUserId(long kakaoId) {
         qnaRepository.getUserId(kakaoId);
-    }
-
-    public void selectQnaCommentFirst(String uuId) {
-        commentRepository.selectQnaCommentFirst(uuId);
-    }
-
-    public void selectQnaItemComment(String uuId) {
-        commentRepository.selectQnaItemComment(uuId);
-    }
-
-    public int getCommentSeqNo(String uuId) {
-        return commentRepository.getLastCommentNo(uuId);
-    }
-
-    public void insertQnaComment(String uuId, long followNo, String userId, String comment, String uploadTime) {
-        commentRepository.insertQnaComment(uuId,followNo,userId, comment,uploadTime);
     }
 }

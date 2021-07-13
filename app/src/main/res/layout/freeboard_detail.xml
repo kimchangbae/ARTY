@@ -44,21 +44,21 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_fb_dt_userId"
+                android:id="@+id/tv_qna_detail_userId"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="작성자"
                 android:textSize="30sp" />
 
             <TextView
-                android:id="@+id/tv_fb_dt_uploadTime"
+                android:id="@+id/tv_qna_detail_uploadTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="작성시간"
                 android:textSize="30sp" />
 
             <TextView
-                android:id="@+id/tv_fb_dt_content"
+                android:id="@+id/tv_qna_detail_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="내용"

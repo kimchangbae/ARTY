@@ -41,14 +41,12 @@ public class MainRepository {
         mDB.collection("USER_ACCOUNT")
         .whereEqualTo("email",email)
         .get()
-        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(Task<QuerySnapshot> task) {
-                if(task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        userId.postValue((String) document.getData().get("userId"));
-                        Log.d(TAG, "DB 에서 검색된 사용자 아이디(파이어베이스) : " + userId);
-                    }
+        .addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String user = (String) document.getData().get("userId");
+                    userId.postValue(user);
+                    Log.d(TAG, "DB 에서 검색된 사용자 아이디(파이어베이스) : " + user);
                 }
             }
         }).addOnFailureListener(e -> e.printStackTrace());
@@ -63,8 +61,9 @@ public class MainRepository {
             public void onComplete(Task<QuerySnapshot> task) {
                 if(task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        userId.postValue((String) document.getData().get("userId"));
-                        Log.d(TAG, "DB 에서 검색된 사용자 아이디(카카오) : " + userId);
+                        String user = (String) document.getData().get("userId");
+                        userId.postValue(user);
+                        Log.d(TAG, "DB 에서 검색된 사용자 아이디(카카오) : " + user);
                     }
                 }
             }

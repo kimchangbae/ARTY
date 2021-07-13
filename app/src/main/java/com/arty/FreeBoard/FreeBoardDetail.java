@@ -37,9 +37,9 @@ public class FreeBoardDetail extends FreeBoardCommon implements Serializable {
         setContentView(R.layout.freeboard_detail);
 
 
-        userId          = findViewById(R.id.tv_fb_dt_userId);
-        content         = findViewById(R.id.tv_fb_dt_content);
-        uploadTime      = findViewById(R.id.tv_fb_dt_uploadTime);
+        userId          = findViewById(R.id.tv_qna_detail_userId);
+        content         = findViewById(R.id.tv_qna_detail_content);
+        uploadTime      = findViewById(R.id.tv_qna_detail_uploadTime);
 
         image1          = findViewById(R.id.imageDetail_1);
         image2          = findViewById(R.id.imageDetail_2);
